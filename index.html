@@ -1,0 +1,532 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>gestiónPyME — Control de Gestión</title>
+<script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+<script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+<script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<script src="https://unpkg.com/recharts@2.12.7/umd/Recharts.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:#F5F3EE;--surface:#FDFCFA;--border:#E2DDD6;--border2:#CBC4BB;
+  --text:#1A1714;--text2:#6B6560;--text3:#9E9892;
+  --accent:#2A5C45;--accent-light:#E8F0EC;
+  --accent2:#C4531A;--accent2-light:#FAF0EA;
+  --yellow:#E8C84A;--yellow-light:#FBF7E4;
+  --blue:#1871B8;--blue-light:#EEF5FB;
+  --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
+  --r:10px;--r-sm:6px;
+}
+body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh;}
+.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
+.logo{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;}
+.logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;}
+.version-badge{font-size:11px;font-family:var(--mono);background:var(--accent-light);color:var(--accent);padding:2px 7px;border-radius:4px;font-weight:500;}
+.nav-steps{display:flex;gap:2px;align-items:center;}
+.nstep{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text3);padding:5px 10px;border-radius:20px;cursor:pointer;transition:all 0.15s;white-space:nowrap;}
+.nstep:hover{background:var(--bg);}
+.nstep.active{color:var(--accent);background:var(--accent-light);font-weight:500;}
+.nstep.done{color:var(--text2);}
+.nstep-num{width:18px;height:18px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;}
+.nstep.done .nstep-num{background:var(--accent);border-color:var(--accent);color:white;font-size:9px;}
+.sep{color:var(--border2);font-size:11px;padding:0 2px;}
+.main{max-width:960px;margin:0 auto;padding:28px 24px 48px;}
+.step-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.step-header{padding:20px 24px 16px;border-bottom:1px solid var(--border);}
+.step-label{font-size:11px;font-weight:600;letter-spacing:0.08em;color:var(--accent);text-transform:uppercase;margin-bottom:4px;}
+.step-title{font-size:20px;font-weight:600;}
+.step-sub{font-size:13px;color:var(--text2);margin-top:3px;}
+.upload-zone{margin:24px;border:1.5px dashed var(--border2);border-radius:var(--r);padding:36px 24px;text-align:center;cursor:pointer;transition:all 0.2s;background:var(--bg);}
+.upload-zone:hover,.upload-zone.drag{border-color:var(--accent);background:var(--accent-light);}
+.upload-icon{font-size:28px;margin-bottom:10px;}
+.upload-title{font-size:15px;font-weight:500;margin-bottom:5px;}
+.upload-sub{font-size:13px;color:var(--text2);margin-bottom:16px;}
+.format-row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
+.ftag{font-size:11px;font-family:var(--mono);background:var(--surface);border:1px solid var(--border);color:var(--text2);padding:3px 8px;border-radius:4px;}
+.divider{display:flex;align-items:center;gap:12px;margin:0 24px;}
+.div-line{flex:1;height:1px;background:var(--border);}
+.div-text{font-size:12px;color:var(--text3);}
+.paste-wrap{margin:16px 24px 24px;}
+.paste-lbl{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;}
+textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;font-family:var(--mono);font-size:12px;color:var(--text);resize:vertical;min-height:80px;outline:none;transition:border 0.15s;line-height:1.6;}
+textarea:focus{border-color:var(--accent);}
+textarea::placeholder{color:var(--text3);}
+.success-note{background:var(--accent-light);border:1px solid var(--accent);border-radius:var(--r-sm);padding:10px 16px;margin:16px 24px 0;display:flex;align-items:center;gap:8px;font-size:13px;color:var(--accent);font-weight:500;}
+.table-wrap{overflow-x:auto;}
+table{width:100%;border-collapse:collapse;font-size:12px;}
+thead th{background:var(--bg);padding:8px 12px;text-align:left;font-weight:600;color:var(--text2);font-size:11px;letter-spacing:0.04em;border-bottom:1px solid var(--border);white-space:nowrap;}
+thead th.r{text-align:right;}
+tbody td{padding:7px 12px;border-bottom:1px solid var(--border);color:var(--text);}
+tbody td.r{text-align:right;font-family:var(--mono);font-size:12px;}
+tbody tr:last-child td{border-bottom:none;}
+tbody tr:hover td{background:var(--accent-light);}
+.preview-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;}
+.preview-title{font-size:13px;font-weight:600;}
+.preview-meta{font-size:12px;color:var(--text3);font-family:var(--mono);}
+.col-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;padding:20px 24px;}
+.col-card{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);padding:12px;transition:all 0.15s;}
+.col-card.mapped{border-color:var(--accent);background:var(--accent-light);}
+.col-name{font-family:var(--mono);font-size:12px;font-weight:500;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.col-sample{font-size:11px;color:var(--text3);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+select{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);padding:6px 8px;font-family:var(--font);font-size:12px;color:var(--text);cursor:pointer;outline:none;}
+select:focus{border-color:var(--accent);}
+.cat-badge{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 7px;border-radius:4px;font-weight:500;margin-top:5px;}
+.cat-ventas{background:var(--accent-light);color:var(--accent);}
+.cat-costos{background:var(--accent2-light);color:var(--accent2);}
+.cat-fecha{background:var(--yellow-light);color:#7A6318;}
+.cat-cliente{background:#EEF0FB;color:#3547B8;}
+.cat-producto{background:#F5EEFB;color:#7325B8;}
+.cat-cantidad{background:#EEF5FB;color:var(--blue);}
+.map-summary{margin:0 24px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;}
+.map-summary h4{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:10px;}
+.map-tags{display:flex;gap:8px;flex-wrap:wrap;}
+.demo-banner{background:var(--yellow-light);border:1px solid #d4b030;border-radius:var(--r-sm);padding:9px 16px;font-size:12px;color:#7A6318;margin-bottom:20px;display:flex;align-items:center;gap:8px;}
+.kpi-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;}
+.kpi-lbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:6px;}
+.kpi-val{font-size:22px;font-weight:600;font-family:var(--mono);}
+.kpi-delta{font-size:12px;margin-top:4px;}
+.up{color:var(--accent);}
+.dn{color:var(--accent2);}
+.warn{color:#7A6318;}
+.period-tabs{display:flex;gap:4px;margin-bottom:20px;}
+.ptab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text2);transition:all 0.15s;}
+.ptab.active{background:var(--accent);color:white;border-color:var(--accent);}
+.charts-grid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
+.chart-full{grid-column:1/-1;}
+.chart-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;}
+.chart-title{font-size:14px;font-weight:600;margin-bottom:2px;}
+.chart-sub{font-size:12px;color:var(--text3);margin-bottom:14px;}
+.legend-row{display:flex;gap:16px;margin-bottom:10px;flex-wrap:wrap;}
+.leg-item{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);}
+.leg-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0;}
+.rank{font-size:11px;font-family:var(--mono);color:var(--text3);}
+.bar-inline{height:5px;border-radius:3px;margin-top:3px;transition:width 0.4s;}
+.mg-badge{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;font-family:var(--mono);}
+.mg-high{background:var(--accent-light);color:var(--accent);}
+.mg-mid{background:var(--yellow-light);color:#7A6318;}
+.mg-low{background:var(--accent2-light);color:var(--accent2);}
+.insight-box{background:var(--yellow-light);border:1px solid #d4b030;border-radius:var(--r-sm);padding:12px 16px;margin-top:16px;font-size:13px;color:#5A4A10;line-height:1.6;}
+.insight-box strong{font-weight:600;}
+.cta-bar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px;}
+.btn-primary{padding:9px 18px;background:var(--accent);border:none;border-radius:var(--r-sm);font-family:var(--font);font-size:13px;font-weight:500;color:white;cursor:pointer;transition:all 0.15s;}
+.btn-primary:hover{background:#22493A;}
+.btn-primary:disabled{opacity:0.4;cursor:not-allowed;}
+.btn-sec{padding:8px 14px;background:transparent;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:var(--font);font-size:13px;color:var(--text2);cursor:pointer;transition:all 0.15s;}
+.btn-sec:hover{border-color:var(--text2);color:var(--text);}
+.btn-ghost{background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;text-decoration:underline;font-family:var(--font);}
+.btn-ghost:hover{color:var(--accent2);}
+@media(max-width:640px){
+  .kpi-grid{grid-template-columns:1fr 1fr;}
+  .charts-grid{grid-template-columns:1fr;}
+  .chart-full{grid-column:1;}
+  .nav-steps .nstep span:not(.nstep-num){display:none;}
+  .header{padding:0 16px;}
+  .main{padding:16px 12px 48px;}
+}
+</style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const {useState,useCallback,useRef} = React;
+const {ResponsiveContainer,AreaChart,Area,BarChart,Bar,XAxis,YAxis,CartesianGrid,Tooltip} = Recharts;
+
+const TOTAL = 12000000;
+const CLIENTES = [
+  {nombre:'ElectroMax SA',       pct:0.30,margen:0.20,categoria:'Celulares'},
+  {nombre:'HogarPlus SRL',       pct:0.15,margen:0.30,categoria:'Línea blanca'},
+  {nombre:'Distribuidora Norte', pct:0.07,margen:0.35,categoria:'Varios'},
+  {nombre:'Almacén Central',     pct:0.07,margen:0.35,categoria:'Varios'},
+  {nombre:'Kiosco del Centro',   pct:0.06,margen:0.35,categoria:'Varios'},
+  {nombre:'Ferretería Roca',     pct:0.06,margen:0.35,categoria:'Varios'},
+  {nombre:'Super La Esquina',    pct:0.06,margen:0.35,categoria:'Varios'},
+  {nombre:'MiniMarket 24hs',     pct:0.05,margen:0.35,categoria:'Varios'},
+  {nombre:'El Buen Precio',      pct:0.05,margen:0.35,categoria:'Varios'},
+  {nombre:'Resto clientes',      pct:0.09,margen:0.35,categoria:'Varios'},
+].map(c=>({...c,ventas:Math.round(TOTAL*c.pct),costo:Math.round(TOTAL*c.pct*(1-c.margen)),ganancia:Math.round(TOTAL*c.pct*c.margen)}));
+
+const FACTORES=[0.065,0.060,0.080,0.075,0.085,0.080,0.090,0.088,0.082,0.095,0.105,0.095];
+const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+const DATA_M=MESES.map((mes,i)=>({mes,ventas:Math.round(TOTAL*FACTORES[i]),costos:Math.round(TOTAL*FACTORES[i]*0.724)}));
+const DATA_T=[
+  {mes:'Q1',ventas:DATA_M.slice(0,3).reduce((s,d)=>s+d.ventas,0),costos:DATA_M.slice(0,3).reduce((s,d)=>s+d.costos,0)},
+  {mes:'Q2',ventas:DATA_M.slice(3,6).reduce((s,d)=>s+d.ventas,0),costos:DATA_M.slice(3,6).reduce((s,d)=>s+d.costos,0)},
+  {mes:'Q3',ventas:DATA_M.slice(6,9).reduce((s,d)=>s+d.ventas,0),costos:DATA_M.slice(6,9).reduce((s,d)=>s+d.costos,0)},
+  {mes:'Q4',ventas:DATA_M.slice(9,12).reduce((s,d)=>s+d.ventas,0),costos:DATA_M.slice(9,12).reduce((s,d)=>s+d.costos,0)},
+];
+
+const CATS=[
+  {value:'',label:'— Sin categoría —'},
+  {value:'fecha',label:'📅 Fecha',badge:'cat-fecha'},
+  {value:'ventas',label:'💰 Ventas',badge:'cat-ventas'},
+  {value:'costos',label:'📦 Costos',badge:'cat-costos'},
+  {value:'cliente',label:'👤 Cliente',badge:'cat-cliente'},
+  {value:'producto',label:'🏷️ Producto',badge:'cat-producto'},
+  {value:'cantidad',label:'🔢 Cantidad',badge:'cat-cantidad'},
+];
+
+const DEMO_CSV=`Mes\tCliente\tCategoria\tVentas\tCostos\nEne\tElectroMax SA\tCelulares\t300000\t240000\nFeb\tHogarPlus SRL\tLinea blanca\t150000\t105000\nMar\tDistribuidora Norte\tVarios\t84000\t54600\nAbr\tAlmacen Central\tVarios\t84000\t54600\nMay\tKiosco del Centro\tVarios\t72000\t46800\nJun\tFerreteria Roca\tVarios\t72000\t46800\nJul\tSuper La Esquina\tVarios\t72000\t46800\nAgo\tMiniMarket 24hs\tVarios\t60000\t39000\nSep\tEl Buen Precio\tVarios\t60000\t39000\nOct\tResto clientes\tVarios\t108000\t70200`;
+
+function guessCategory(col){
+  const n=col.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(/fecha|date|mes|periodo/.test(n)) return 'fecha';
+  if(/venta|ingreso|precio|importe|total|factura/.test(n)) return 'ventas';
+  if(/costo|gasto|cmp/.test(n)) return 'costos';
+  if(/cliente|razon|empresa|nombre/.test(n)) return 'cliente';
+  if(/producto|articulo|item|categoria/.test(n)) return 'producto';
+  if(/cantidad|qty|unidad/.test(n)) return 'cantidad';
+  return '';
+}
+
+function parseCSV(text){
+  const lines=text.trim().split('\n').filter(l=>l.trim());
+  if(lines.length<2) return null;
+  const sep=lines[0].includes('\t')?'\t':lines[0].includes(';')?';':',';
+  const headers=lines[0].split(sep).map(h=>h.trim().replace(/^["']|["']$/g,''));
+  const rows=lines.slice(1).map(l=>{
+    const vals=l.split(sep).map(v=>v.trim().replace(/^["']|["']$/g,''));
+    const row={};headers.forEach((h,i)=>row[h]=vals[i]||'');return row;
+  });
+  return{headers,rows};
+}
+
+const fmtK=n=>n>=1000000?`$${(n/1000000).toFixed(1)}M`:`$${(n/1000).toFixed(0)}K`;
+
+const CTip=({active,payload,label})=>{
+  if(!active||!payload?.length) return null;
+  return(
+    <div style={{background:'var(--surface)',border:'1px solid var(--border)',borderRadius:8,padding:'10px 14px',fontSize:12}}>
+      <div style={{fontWeight:600,marginBottom:6}}>{label}</div>
+      {payload.map((p,i)=>(
+        <div key={i} style={{color:p.color,display:'flex',justifyContent:'space-between',gap:16}}>
+          <span>{p.name}</span><span style={{fontFamily:'var(--mono)',fontWeight:500}}>{fmtK(p.value)}</span>
+        </div>
+      ))}
+      {payload.length===2&&<div style={{borderTop:'1px solid var(--border)',marginTop:6,paddingTop:6,color:'var(--accent)',fontWeight:500}}>
+        Margen: {Math.round((1-payload[1].value/payload[0].value)*100)}%
+      </div>}
+    </div>
+  );
+};
+
+function StepImport({onLoad}){
+  const [paste,setPaste]=useState('');
+  const [drag,setDrag]=useState(false);
+  const fileRef=useRef();
+
+  const handleFile=useCallback((file)=>{
+    const ext=file.name.split('.').pop().toLowerCase();
+    if(ext==='csv'||ext==='txt'){
+      const r=new FileReader();
+      r.onload=e=>{const p=parseCSV(e.target.result);if(p) onLoad(p,file.name);};
+      r.readAsText(file,'UTF-8');
+    } else if(ext==='xlsx'||ext==='xls'){
+      const r=new FileReader();
+      r.onload=e=>{
+        const wb=XLSX.read(e.target.result,{type:'array'});
+        const ws=wb.Sheets[wb.SheetNames[0]];
+        const json=XLSX.utils.sheet_to_json(ws,{defval:''});
+        if(json.length>0) onLoad({headers:Object.keys(json[0]),rows:json},file.name);
+      };
+      r.readAsArrayBuffer(file);
+    }
+  },[onLoad]);
+
+  const handlePaste=()=>{
+    const p=parseCSV(paste);
+    if(p) onLoad(p,'datos pegados');
+    else alert('No se detectó estructura. Asegurate de incluir encabezados en la primera fila.');
+  };
+
+  return(
+    <div className="step-card">
+      <div className="step-header">
+        <div className="step-label">Paso 1 de 3</div>
+        <div className="step-title">Importá tus datos</div>
+        <div className="step-sub">Subí un Excel o CSV, o pegá tu tabla directamente desde Google Sheets</div>
+      </div>
+      <div className={`upload-zone${drag?' drag':''}`}
+        onDragOver={e=>{e.preventDefault();setDrag(true);}}
+        onDragLeave={()=>setDrag(false)}
+        onDrop={e=>{e.preventDefault();setDrag(false);const f=e.dataTransfer.files[0];if(f) handleFile(f);}}
+        onClick={()=>fileRef.current.click()}>
+        <input ref={fileRef} type="file" accept=".csv,.xlsx,.xls,.txt" style={{display:'none'}} onChange={e=>e.target.files[0]&&handleFile(e.target.files[0])}/>
+        <div className="upload-icon">📂</div>
+        <div className="upload-title">Arrastrá tu archivo o hacé click para buscar</div>
+        <div className="upload-sub">La primera fila debe contener los nombres de columna</div>
+        <div className="format-row">
+          {['.xlsx','.xls','.csv','.txt'].map(f=><span key={f} className="ftag">{f}</span>)}
+        </div>
+      </div>
+      <div className="divider"><div className="div-line"/><div className="div-text">o pegá tu tabla</div><div className="div-line"/></div>
+      <div className="paste-wrap">
+        <div className="paste-lbl">Copiá desde Excel / Google Sheets y pegá acá:</div>
+        <textarea placeholder={"Fecha\tCliente\tVentas\tCostos\nEne\tElectroMax SA\t300000\t240000\n..."} value={paste} onChange={e=>setPaste(e.target.value)}/>
+        <div style={{display:'flex',alignItems:'center',justifyContent:'space-between',marginTop:8,gap:12}}>
+          <button className="btn-ghost" onClick={()=>setPaste(DEMO_CSV)}>Cargar datos de ejemplo →</button>
+          <button className="btn-primary" onClick={handlePaste} disabled={!paste.trim()}>Procesar →</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StepCategorize({data,fileName,mapping,setMapping,onNext,onBack}){
+  const mapped=Object.values(mapping).filter(v=>v).length;
+  return(
+    <div className="step-card">
+      <div className="step-header">
+        <div className="step-label">Paso 2 de 3</div>
+        <div className="step-title">Categorizá tus columnas</div>
+        <div className="step-sub"><strong>{fileName}</strong> — {data.rows.length} filas, {data.headers.length} columnas.{' '}
+          <button className="btn-ghost" onClick={onBack}>Cambiar archivo</button></div>
+      </div>
+      <div className="success-note">✓ Datos cargados — revisá la vista previa y categorizá cada columna</div>
+      <div style={{padding:'16px 24px'}}>
+        <div className="preview-hdr">
+          <div className="preview-title">Vista previa</div>
+          <div className="preview-meta">{Math.min(4,data.rows.length)} de {data.rows.length} filas</div>
+        </div>
+        <div className="table-wrap" style={{border:'1px solid var(--border)',borderRadius:6}}>
+          <table>
+            <thead><tr>{data.headers.map(h=><th key={h}>{h}</th>)}</tr></thead>
+            <tbody>{data.rows.slice(0,4).map((r,i)=>(
+              <tr key={i}>{data.headers.map(h=><td key={h}>{String(r[h]??'')}</td>)}</tr>
+            ))}</tbody>
+          </table>
+          {data.rows.length>4&&<div style={{textAlign:'center',padding:'6px',fontSize:11,color:'var(--text3)',background:'var(--bg)',borderTop:'1px solid var(--border)'}}>+{data.rows.length-4} filas más</div>}
+        </div>
+      </div>
+      <div style={{padding:'0 24px',borderTop:'1px solid var(--border)',paddingTop:16}}>
+        <div className="step-label" style={{marginBottom:4}}>Capa semántica</div>
+        <div style={{fontSize:13,color:'var(--text2)',marginBottom:4}}>¿Qué representa cada columna? Detectamos {mapped} de {data.headers.length} automáticamente.</div>
+      </div>
+      <div className="col-grid">
+        {data.headers.map(col=>{
+          const val=mapping[col]||'';
+          const cat=CATS.find(c=>c.value===val);
+          const sample=data.rows.slice(0,3).map(r=>r[col]).filter(Boolean).join(', ');
+          return(
+            <div key={col} className={`col-card${val?' mapped':''}`}>
+              <div className="col-name" title={col}>{col}</div>
+              <div className="col-sample">ej: {sample||'—'}</div>
+              <select value={val} onChange={e=>setMapping(m=>({...m,[col]:e.target.value}))}>
+                {CATS.map(c=><option key={c.value} value={c.value}>{c.label}</option>)}
+              </select>
+              {val&&<div className={`cat-badge ${cat?.badge||''}`}>{cat?.label}</div>}
+            </div>
+          );
+        })}
+      </div>
+      <div className="map-summary">
+        <h4>Resumen del mapeo</h4>
+        <div className="map-tags">
+          {CATS.slice(1).map(cat=>{
+            const cols=data.headers.filter(h=>mapping[h]===cat.value);
+            if(!cols.length) return null;
+            return <span key={cat.value} className={`cat-badge ${cat.badge}`} style={{padding:'4px 10px',fontSize:12}}>{cat.label}: {cols.join(', ')}</span>;
+          })}
+          {mapped===0&&<span style={{fontSize:13,color:'var(--text3)'}}>Sin columnas categorizadas todavía</span>}
+        </div>
+      </div>
+      <div className="cta-bar">
+        <div style={{fontSize:12,color:'var(--text2)'}}>
+          {mapped<2?'Categorizá al menos 2 columnas para continuar':`✓ ${mapped} columnas categorizadas — listo`}
+        </div>
+        <div style={{display:'flex',gap:8}}>
+          <button className="btn-sec" onClick={onBack}>← Volver</button>
+          <button className="btn-primary" disabled={mapped<2} onClick={onNext}>Ver Dashboard →</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function StepDashboard({onBack}){
+  const [periodo,setPeriodo]=useState('mensual');
+  const data=periodo==='mensual'?DATA_M:DATA_T;
+  const totV=CLIENTES.reduce((s,c)=>s+c.ventas,0);
+  const totG=CLIENTES.reduce((s,c)=>s+c.ganancia,0);
+  const margenGlobal=Math.round(totG/totV*100);
+  const maxV=CLIENTES[0].ventas;
+  const seg1G=CLIENTES[0].ganancia;
+  const seg2G=CLIENTES[1].ganancia;
+  const seg3V=CLIENTES.slice(2).reduce((s,c)=>s+c.ventas,0);
+  const seg3G=CLIENTES.slice(2).reduce((s,c)=>s+c.ganancia,0);
+  const getMgClass=p=>p>=35?'mg-high':p>=28?'mg-mid':'mg-low';
+
+  return(
+    <div>
+      <div className="demo-banner">
+        📊 Datos de ejemplo — así se ve cuando cargás tu propio Excel
+      </div>
+      <div className="kpi-grid">
+        <div className="kpi">
+          <div className="kpi-lbl">Ventas totales</div>
+          <div className="kpi-val">{fmtK(totV)}</div>
+          <div className="kpi-delta up">↑ 18% vs año anterior</div>
+        </div>
+        <div className="kpi">
+          <div className="kpi-lbl">Ganancia bruta</div>
+          <div className="kpi-val">{fmtK(totG)}</div>
+          <div className="kpi-delta up">↑ 22% vs año anterior</div>
+        </div>
+        <div className="kpi">
+          <div className="kpi-lbl">Margen global</div>
+          <div className="kpi-val warn">{margenGlobal}%</div>
+          <div className="kpi-delta warn">⚠ Arrastrado por cliente 1</div>
+        </div>
+        <div className="kpi">
+          <div className="kpi-lbl">Clientes activos</div>
+          <div className="kpi-val">10</div>
+          <div className="kpi-delta up">1 cliente = 30% del total</div>
+        </div>
+      </div>
+      <div className="period-tabs">
+        <button className={`ptab${periodo==='mensual'?' active':''}`} onClick={()=>setPeriodo('mensual')}>Mensual</button>
+        <button className={`ptab${periodo==='trimestral'?' active':''}`} onClick={()=>setPeriodo('trimestral')}>Trimestral</button>
+      </div>
+      <div className="charts-grid">
+        <div className="chart-card chart-full">
+          <div className="chart-title">Ventas vs Costos</div>
+          <div className="chart-sub">El área entre las curvas es tu margen bruto</div>
+          <div className="legend-row">
+            <div className="leg-item"><div className="leg-dot" style={{background:'#2A5C45'}}/>Ventas</div>
+            <div className="leg-item"><div className="leg-dot" style={{background:'#C4531A'}}/>Costos</div>
+          </div>
+          <ResponsiveContainer width="100%" height={200}>
+            <AreaChart data={data} margin={{top:4,right:8,left:8,bottom:0}}>
+              <defs>
+                <linearGradient id="gv" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#2A5C45" stopOpacity={0.15}/>
+                  <stop offset="95%" stopColor="#2A5C45" stopOpacity={0.02}/>
+                </linearGradient>
+                <linearGradient id="gc" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="5%" stopColor="#C4531A" stopOpacity={0.12}/>
+                  <stop offset="95%" stopColor="#C4531A" stopOpacity={0.02}/>
+                </linearGradient>
+              </defs>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E2DDD6" vertical={false}/>
+              <XAxis dataKey="mes" tick={{fontSize:11,fill:'#9E9892',fontFamily:'DM Sans'}} axisLine={false} tickLine={false}/>
+              <YAxis tickFormatter={fmtK} tick={{fontSize:10,fill:'#9E9892',fontFamily:'DM Mono'}} axisLine={false} tickLine={false} width={52}/>
+              <Tooltip content={<CTip/>}/>
+              <Area type="monotone" dataKey="ventas" name="Ventas" stroke="#2A5C45" strokeWidth={2} fill="url(#gv)"/>
+              <Area type="monotone" dataKey="costos" name="Costos" stroke="#C4531A" strokeWidth={2} fill="url(#gc)"/>
+            </AreaChart>
+          </ResponsiveContainer>
+        </div>
+        <div className="chart-card">
+          <div className="chart-title">Top clientes por facturación</div>
+          <div className="chart-sub">Ventas anuales y margen por cliente</div>
+          <div className="table-wrap">
+            <table>
+              <thead><tr><th>#</th><th>Cliente</th><th className="r">Ventas</th><th className="r">Margen</th></tr></thead>
+              <tbody>
+                {CLIENTES.map((c,i)=>(
+                  <tr key={i}>
+                    <td><span className="rank">#{i+1}</span></td>
+                    <td>
+                      <div style={{fontWeight:i<2?500:400,fontSize:12}}>{c.nombre}</div>
+                      <div className="bar-inline" style={{width:`${Math.round(c.ventas/maxV*100)}%`,background:i===0?'#C4531A':i===1?'#E8C84A':'#2A5C45'}}/>
+                    </td>
+                    <td className="r">{fmtK(c.ventas)}</td>
+                    <td className="r"><span className={`mg-badge ${getMgClass(Math.round(c.margen*100))}`}>{Math.round(c.margen*100)}%</span></td>
+                  </tr>
+                ))}
+              </tbody>
+            </table>
+          </div>
+        </div>
+        <div className="chart-card">
+          <div className="chart-title">Ganancia por segmento</div>
+          <div className="chart-sub">Dónde se genera realmente el margen</div>
+          <ResponsiveContainer width="100%" height={180}>
+            <BarChart
+              data={[
+                {seg:'ElectroMax (30%)',ventas:CLIENTES[0].ventas,ganancia:seg1G,mg:20},
+                {seg:'HogarPlus (15%)',ventas:CLIENTES[1].ventas,ganancia:seg2G,mg:30},
+                {seg:'Resto (55%)',ventas:seg3V,ganancia:seg3G,mg:35},
+              ]}
+              margin={{top:4,right:8,left:8,bottom:0}}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#E2DDD6" vertical={false}/>
+              <XAxis dataKey="seg" tick={{fontSize:10,fill:'#9E9892',fontFamily:'DM Sans'}} axisLine={false} tickLine={false}/>
+              <YAxis tickFormatter={fmtK} tick={{fontSize:10,fill:'#9E9892',fontFamily:'DM Mono'}} axisLine={false} tickLine={false} width={52}/>
+              <Tooltip content={({active,payload,label})=>{
+                if(!active||!payload?.length) return null;
+                return <div style={{background:'#FDFCFA',border:'1px solid #E2DDD6',borderRadius:8,padding:'10px 14px',fontSize:12}}>
+                  <div style={{fontWeight:600,marginBottom:6}}>{label}</div>
+                  <div style={{color:'#2A5C45',display:'flex',justifyContent:'space-between',gap:16}}><span>Ventas</span><span style={{fontFamily:'DM Mono'}}>{fmtK(payload[0]?.value||0)}</span></div>
+                  <div style={{color:'#C4531A',display:'flex',justifyContent:'space-between',gap:16}}><span>Ganancia</span><span style={{fontFamily:'DM Mono'}}>{fmtK(payload[1]?.value||0)}</span></div>
+                  <div style={{borderTop:'1px solid #E2DDD6',marginTop:6,paddingTop:6,fontWeight:500,color:'#2A5C45'}}>Margen: {payload[0]?.payload?.mg}%</div>
+                </div>;
+              }}/>
+              <Bar dataKey="ventas" name="Ventas" fill="#E8F0EC" radius={[4,4,0,0]}/>
+              <Bar dataKey="ganancia" name="Ganancia" fill="#2A5C45" radius={[4,4,0,0]}/>
+            </BarChart>
+          </ResponsiveContainer>
+          <div className="insight-box">
+            💡 <strong>Insight clave:</strong> ElectroMax es el 30% de tus ventas pero solo el <strong>{Math.round(seg1G/totG*100)}% de tu ganancia</strong>. Los clientes chicos generan el <strong>{Math.round(seg3G/totG*100)}% del margen total</strong>.
+          </div>
+        </div>
+      </div>
+      <div className="cta-bar">
+        <div style={{fontSize:13,color:'var(--text2)'}}>✓ Dashboard completo — Chat IA disponible próximamente</div>
+        <div style={{display:'flex',gap:8}}>
+          <button className="btn-sec" onClick={onBack}>← Volver</button>
+          <button className="btn-primary" disabled>Chat IA — próximamente →</button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function App(){
+  const [step,setStep]=useState(1);
+  const [csvData,setCsvData]=useState(null);
+  const [fileName,setFileName]=useState('');
+  const [mapping,setMapping]=useState({});
+
+  const handleLoad=useCallback((parsed,name)=>{
+    setCsvData(parsed);setFileName(name);
+    const auto={};parsed.headers.forEach(h=>{auto[h]=guessCategory(h);});
+    setMapping(auto);setStep(2);
+  },[]);
+
+  const STEPS=['Importar','Categorizar','Dashboard','Chat IA'];
+
+  return(
+    <div>
+      <div className="header">
+        <div className="logo"><div className="logo-dot"/>gestiónPyME<span className="version-badge">v1.0</span></div>
+        <div className="nav-steps">
+          {STEPS.map((s,i)=>(
+            <React.Fragment key={s}>
+              {i>0&&<span className="sep">›</span>}
+              <div className={`nstep${step===i+1?' active':step>i+1?' done':''}`}
+                onClick={()=>{if(step>i+1) setStep(i+1);}}>
+                <div className="nstep-num">{step>i+1?'✓':i+1}</div>
+                <span>{s}</span>
+              </div>
+            </React.Fragment>
+          ))}
+        </div>
+      </div>
+      <div className="main">
+        {step===1&&<StepImport onLoad={handleLoad}/>}
+        {step===2&&csvData&&<StepCategorize data={csvData} fileName={fileName} mapping={mapping} setMapping={setMapping} onNext={()=>setStep(3)} onBack={()=>setStep(1)}/>}
+        {step===3&&<StepDashboard onBack={()=>setStep(2)}/>}
+      </div>
+    </div>
+  );
+}
+
+ReactDOM.render(<App/>,document.getElementById('root'));
+</script>
+</body>
+</html>
