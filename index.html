@@ -5,135 +5,205 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>gestiónPyME — Control de Gestión</title>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
-  --bg:#F5F3EE;--surface:#FDFCFA;--border:#E2DDD6;--border2:#CBC4BB;
+  --bg:#F4F2ED;--surface:#FDFCFA;--surface2:#F9F7F3;
+  --border:#E3DDD5;--border2:#CAC4BB;
   --text:#1A1714;--text2:#6B6560;--text3:#9E9892;
-  --accent:#2A5C45;--accent-light:#E8F0EC;
-  --accent2:#C4531A;--accent2-light:#FAF0EA;
-  --yellow:#E8C84A;--yellow-light:#FBF7E4;
+  --accent:#2A5C45;--accent-l:#E8F0EC;--accent-d:#1E4433;
+  --red:#C4531A;--red-l:#FAF0EA;
+  --gold:#C9950C;--gold-l:#FBF5E0;
+  --blue:#1A5FB4;--blue-l:#EEF3FB;
+  --purple:#6B3FA0;--purple-l:#F3EEFB;
   --font:'DM Sans',sans-serif;--mono:'DM Mono',monospace;
-  --r:10px;--r-sm:6px;
+  --r:10px;--r-sm:6px;--r-lg:14px;
+  --shadow:0 1px 3px rgba(0,0,0,.06),0 1px 2px rgba(0,0,0,.04);
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh;}
-.header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
-.logo{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;}
+
+/* ── HEADER ── */
+.hdr{background:var(--surface);border-bottom:1px solid var(--border);padding:0 28px;height:54px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:200;box-shadow:var(--shadow);}
+.logo{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;letter-spacing:-.01em;}
 .logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;}
-.vbadge{font-size:11px;font-family:var(--mono);background:var(--accent-light);color:var(--accent);padding:2px 7px;border-radius:4px;font-weight:500;}
-.nav{display:flex;gap:2px;align-items:center;}
-.ns{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text3);padding:5px 10px;border-radius:20px;cursor:default;white-space:nowrap;}
-.ns.active{color:var(--accent);background:var(--accent-light);font-weight:500;}
+.vbadge{font-size:10px;font-family:var(--mono);background:var(--accent-l);color:var(--accent);padding:2px 6px;border-radius:4px;font-weight:500;}
+.nav{display:flex;gap:1px;align-items:center;}
+.ns{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text3);padding:5px 11px;border-radius:20px;cursor:default;white-space:nowrap;transition:all .15s;}
+.ns.active{color:var(--accent);background:var(--accent-l);font-weight:500;}
 .ns.done{color:var(--text2);cursor:pointer;}
 .ns.done:hover{background:var(--bg);}
-.ns-n{width:18px;height:18px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;}
-.ns.done .ns-n{background:var(--accent);border-color:var(--accent);color:#fff;font-size:9px;}
-.sep{color:var(--border2);font-size:11px;padding:0 2px;}
-.main{max-width:960px;margin:0 auto;padding:28px 24px 48px;}
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:16px;}
+.ns-n{width:17px;height:17px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;flex-shrink:0;}
+.ns.done .ns-n{background:var(--accent);border-color:var(--accent);color:#fff;}
+.sep{color:var(--border2);font-size:10px;padding:0 1px;}
+
+/* ── LAYOUT ── */
+.main{max-width:980px;margin:0 auto;padding:28px 24px 60px;}
+
+/* ── CARDS ── */
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;margin-bottom:16px;box-shadow:var(--shadow);}
 .card-hdr{padding:20px 24px 16px;border-bottom:1px solid var(--border);}
-.slabel{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin-bottom:4px;}
-.stitle{font-size:20px;font-weight:600;}
+.slabel{font-size:10px;font-weight:600;letter-spacing:.1em;color:var(--accent);text-transform:uppercase;margin-bottom:4px;}
+.stitle{font-size:19px;font-weight:600;letter-spacing:-.02em;}
 .ssub{font-size:13px;color:var(--text2);margin-top:3px;}
-/* UPLOAD */
-.dropzone{margin:24px;border:1.5px dashed var(--border2);border-radius:var(--r);padding:36px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);position:relative;}
-.dropzone:hover{border-color:var(--accent);background:var(--accent-light);}
+
+/* ── STEP 1: FILE MODULES ── */
+.modules-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;padding:20px 24px;}
+.mod{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);padding:16px;transition:all .15s;position:relative;}
+.mod.loaded{border-color:var(--accent);background:var(--accent-l);}
+.mod.optional{border-style:dashed;}
+.mod-icon{font-size:20px;margin-bottom:8px;}
+.mod-title{font-size:13px;font-weight:600;margin-bottom:2px;}
+.mod-desc{font-size:12px;color:var(--text2);margin-bottom:10px;line-height:1.5;}
+.mod-tag{display:inline-block;font-size:10px;font-family:var(--mono);padding:1px 6px;border-radius:3px;margin-bottom:8px;font-weight:500;}
+.tag-req{background:var(--accent-l);color:var(--accent);}
+.tag-opt{background:var(--gold-l);color:var(--gold);}
+.mod-btns{display:flex;gap:6px;flex-wrap:wrap;}
+.mod-status{font-size:11px;color:var(--accent);font-weight:500;margin-top:6px;display:flex;align-items:center;gap:4px;}
+
+/* ── DROPZONE ── */
+.dropzone{border:1.5px dashed var(--border2);border-radius:var(--r-sm);padding:10px 12px;text-align:center;cursor:pointer;transition:all .2s;background:var(--surface);font-size:12px;color:var(--text2);position:relative;}
+.dropzone:hover{border-color:var(--accent);background:var(--accent-l);color:var(--accent);}
 .dropzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
-.dicon{font-size:28px;margin-bottom:10px;}
-.dtitle{font-size:15px;font-weight:500;margin-bottom:5px;}
-.dsub{font-size:13px;color:var(--text2);margin-bottom:16px;}
-.ftags{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;}
-.ftag{font-size:11px;font-family:var(--mono);background:var(--surface);border:1px solid var(--border);color:var(--text2);padding:3px 8px;border-radius:4px;}
-.divrow{display:flex;align-items:center;gap:12px;margin:0 24px;}
+
+/* ── TEMPLATE BOX ── */
+.tpl-bar{background:var(--gold-l);border-bottom:1px solid var(--border);padding:12px 24px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.tpl-txt{font-size:13px;color:#7A5C0A;}
+.tpl-txt strong{font-weight:600;}
+
+/* ── PASTE ── */
+.paste-section{padding:0 24px 20px;border-top:1px solid var(--border);margin-top:4px;padding-top:16px;}
+.divrow{display:flex;align-items:center;gap:10px;margin-bottom:12px;}
 .divline{flex:1;height:1px;background:var(--border);}
-.divtxt{font-size:12px;color:var(--text3);}
-.paste-wrap{margin:16px 24px 24px;}
-.paste-lbl{font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;}
-textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;font-family:var(--mono);font-size:12px;color:var(--text);resize:vertical;min-height:80px;outline:none;transition:border .15s;line-height:1.6;}
+.divtxt{font-size:11px;color:var(--text3);}
+textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);padding:10px 12px;font-family:var(--mono);font-size:12px;color:var(--text);resize:vertical;min-height:72px;outline:none;transition:border .15s;line-height:1.6;}
 textarea:focus{border-color:var(--accent);}
 textarea::placeholder{color:var(--text3);}
-/* TEMPLATE */
-.template-box{margin:0 24px 24px;background:var(--accent-light);border:1px solid var(--accent);border-radius:var(--r-sm);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
-.template-txt{font-size:13px;color:var(--accent);}
-.template-txt strong{font-weight:600;}
-/* TABLE */
+
+/* ── TABLE ── */
 .tscroll{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
-thead th{background:var(--bg);padding:8px 12px;text-align:left;font-weight:600;color:var(--text2);font-size:11px;letter-spacing:.04em;border-bottom:1px solid var(--border);white-space:nowrap;}
+thead th{background:var(--bg);padding:7px 12px;text-align:left;font-weight:600;color:var(--text2);font-size:11px;letter-spacing:.04em;border-bottom:1px solid var(--border);white-space:nowrap;}
 thead th.r{text-align:right;}
 tbody td{padding:7px 12px;border-bottom:1px solid var(--border);color:var(--text);}
 tbody td.r{text-align:right;font-family:var(--mono);font-size:12px;}
 tbody tr:last-child td{border-bottom:none;}
-tbody tr:hover td{background:var(--accent-light);}
-/* COL GRID */
-.col-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:10px;padding:20px 24px;}
+tbody tr:hover td{background:var(--accent-l);}
+
+/* ── COL GRID ── */
+.col-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(185px,1fr));gap:10px;padding:16px 24px;}
 .col-card{background:var(--bg);border:1.5px solid var(--border);border-radius:var(--r);padding:12px;transition:all .15s;}
-.col-card.mapped{border-color:var(--accent);background:var(--accent-light);}
+.col-card.mapped{border-color:var(--accent);background:var(--accent-l);}
 .col-name{font-family:var(--mono);font-size:12px;font-weight:500;margin-bottom:3px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.col-sample{font-size:11px;color:var(--text3);margin-bottom:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-select{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);padding:6px 8px;font-family:var(--font);font-size:12px;color:var(--text);cursor:pointer;outline:none;}
+.col-sample{font-size:11px;color:var(--text3);margin-bottom:8px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+select{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--r-sm);padding:5px 7px;font-family:var(--font);font-size:12px;color:var(--text);cursor:pointer;outline:none;}
 select:focus{border-color:var(--accent);}
-.cbadge{display:inline-flex;align-items:center;gap:4px;font-size:11px;padding:2px 7px;border-radius:4px;font-weight:500;margin-top:5px;}
-.cv{background:var(--accent-light);color:var(--accent);}
-.cc{background:var(--accent2-light);color:var(--accent2);}
-.cf{background:var(--yellow-light);color:#7A6318;}
-.ccl{background:#EEF0FB;color:#3547B8;}
-.cp{background:#F5EEFB;color:#7325B8;}
-.cq{background:#EEF5FB;color:#1871B8;}
-.mapsumm{margin:0 24px 0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;}
-.mapsumm h4{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
-.maptags{display:flex;gap:8px;flex-wrap:wrap;}
-/* SAVE BANNER */
-.save-banner{margin:12px 24px 20px;background:var(--accent);border-radius:var(--r-sm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
-.save-banner span{font-size:13px;color:#fff;}
-.save-banner.saved{background:#E8F0EC;border:1px solid var(--accent);}
-.save-banner.saved span{color:var(--accent);}
-/* DASHBOARD */
-.dbanner{background:var(--yellow-light);border:1px solid #d4b030;border-radius:var(--r-sm);padding:9px 16px;font-size:12px;color:#7A6318;margin-bottom:20px;}
+.cbadge{display:inline-flex;align-items:center;font-size:10px;padding:2px 6px;border-radius:3px;font-weight:500;margin-top:5px;}
+.cv{background:var(--accent-l);color:var(--accent);}
+.cc{background:var(--red-l);color:var(--red);}
+.cf{background:var(--gold-l);color:var(--gold);}
+.ccl{background:var(--blue-l);color:var(--blue);}
+.cp{background:var(--purple-l);color:var(--purple);}
+.cq{background:#EEF5FB;color:#1A5FB4;}
+
+/* ── SAVE BANNER ── */
+.save-bar{padding:14px 24px;border-top:1px solid var(--border);display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--surface2);}
+.save-bar.saved{background:var(--accent-l);}
+
+/* ── DASHBOARD ── */
+.demo-note{background:var(--gold-l);border-bottom:1px solid #E8C84A;padding:9px 24px;font-size:12px;color:#7A5C0A;display:flex;align-items:center;gap:6px;}
 .kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
-.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;}
-.klbl{font-size:11px;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;}
-.kval{font-size:22px;font-weight:600;font-family:var(--mono);}
-.kdelta{font-size:12px;margin-top:4px;}
+.kpi{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:16px;box-shadow:var(--shadow);}
+.klbl{font-size:10px;color:var(--text3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+.kval{font-size:21px;font-weight:600;font-family:var(--mono);letter-spacing:-.02em;}
+.kdelta{font-size:11px;margin-top:4px;}
 .up{color:var(--accent);}
-.warn{color:#7A6318;}
-.ptabs{display:flex;gap:4px;margin-bottom:20px;}
-.ptab{padding:6px 14px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text2);transition:all .15s;}
+.dn{color:var(--red);}
+.warn{color:var(--gold);}
+
+/* ── TABS ── */
+.tabs{display:flex;gap:4px;margin-bottom:20px;border-bottom:1px solid var(--border);padding-bottom:0;}
+.tab{padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;border:none;background:none;color:var(--text2);border-bottom:2px solid transparent;margin-bottom:-1px;transition:all .15s;font-family:var(--font);}
+.tab.active{color:var(--accent);border-bottom-color:var(--accent);}
+.tab:hover:not(.active){color:var(--text);}
+
+.ptabs{display:flex;gap:4px;margin-bottom:16px;}
+.ptab{padding:5px 12px;border-radius:20px;font-size:12px;font-weight:500;cursor:pointer;border:1px solid var(--border);background:var(--surface);color:var(--text2);transition:all .15s;font-family:var(--font);}
 .ptab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+/* ── CHARTS GRID ── */
 .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px;}
 .cfull{grid-column:1/-1;}
-.ccrd{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:20px;}
-.ctitle{font-size:14px;font-weight:600;margin-bottom:2px;}
-.csub{font-size:12px;color:var(--text3);margin-bottom:14px;}
-.legrow{display:flex;gap:16px;margin-bottom:10px;}
-.legitem{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text2);}
-.legdot{width:10px;height:10px;border-radius:2px;}
+.ccrd{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;box-shadow:var(--shadow);}
+.ctitle{font-size:13px;font-weight:600;margin-bottom:2px;letter-spacing:-.01em;}
+.csub{font-size:11px;color:var(--text3);margin-bottom:14px;}
+.legrow{display:flex;gap:14px;margin-bottom:10px;flex-wrap:wrap;}
+.legitem{display:flex;align-items:center;gap:5px;font-size:11px;color:var(--text2);}
+.legdot{width:9px;height:9px;border-radius:2px;flex-shrink:0;}
 .rankn{font-size:11px;font-family:var(--mono);color:var(--text3);}
-.barinl{height:5px;border-radius:3px;margin-top:3px;}
-.mgb{display:inline-block;padding:2px 8px;border-radius:4px;font-size:11px;font-weight:500;font-family:var(--mono);}
-.mgh{background:var(--accent-light);color:var(--accent);}
-.mgm{background:var(--yellow-light);color:#7A6318;}
-.mgl{background:var(--accent2-light);color:var(--accent2);}
-.ibox{background:var(--yellow-light);border:1px solid #d4b030;border-radius:var(--r-sm);padding:12px 16px;margin-top:16px;font-size:13px;color:#5A4A10;line-height:1.6;}
+.barinl{height:4px;border-radius:2px;margin-top:3px;transition:width .4s;}
+.mgb{display:inline-block;padding:1px 7px;border-radius:3px;font-size:10px;font-weight:600;font-family:var(--mono);}
+.mgh{background:var(--accent-l);color:var(--accent);}
+.mgm{background:var(--gold-l);color:var(--gold);}
+.mgl{background:var(--red-l);color:var(--red);}
+.ibox{background:var(--gold-l);border:1px solid #E8C84A;border-radius:var(--r-sm);padding:12px 14px;margin-top:14px;font-size:12px;color:#5A4208;line-height:1.6;}
 .ibox strong{font-weight:600;}
-.ctabar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px;}
-/* BUTTONS */
-.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:var(--accent);border:none;border-radius:var(--r-sm);font-family:var(--font);font-size:13px;font-weight:500;color:#fff;cursor:pointer;transition:all .15s;}
-.btn:hover{background:#22493A;}
+
+/* ── CASCADE TABLE ── */
+.cascade{width:100%;border-collapse:collapse;font-size:13px;}
+.cascade tr td{padding:8px 12px;border-bottom:1px solid var(--border);}
+.cascade tr:last-child td{border-bottom:none;}
+.cascade .lbl{color:var(--text2);}
+.cascade .val{text-align:right;font-family:var(--mono);font-weight:500;}
+.cascade .sub{background:var(--bg);}
+.cascade .sub .lbl{padding-left:20px;font-size:12px;color:var(--text3);}
+.cascade .total-row td{background:var(--accent-l);font-weight:600;color:var(--accent);}
+.cascade .warn-row td{background:var(--red-l);color:var(--red);font-weight:600;}
+.cascade .sep-row td{background:var(--bg);padding:4px 12px;font-size:10px;text-transform:uppercase;letter-spacing:.07em;color:var(--text3);}
+
+/* ── AI CHAT ── */
+.chat-wrap{display:flex;flex-direction:column;height:460px;}
+.chat-msgs{flex:1;overflow-y:auto;padding:16px;display:flex;flex-direction:column;gap:10px;}
+.msg{max-width:80%;padding:10px 14px;border-radius:12px;font-size:13px;line-height:1.6;}
+.msg.user{align-self:flex-end;background:var(--accent);color:#fff;border-bottom-right-radius:3px;}
+.msg.ai{align-self:flex-start;background:var(--bg);border:1px solid var(--border);color:var(--text);border-bottom-left-radius:3px;}
+.msg.ai.thinking{color:var(--text3);font-style:italic;}
+.chat-input-row{padding:12px 16px;border-top:1px solid var(--border);display:flex;gap:8px;background:var(--surface2);}
+.chat-input{flex:1;background:var(--bg);border:1px solid var(--border);border-radius:20px;padding:8px 16px;font-family:var(--font);font-size:13px;color:var(--text);outline:none;transition:border .15s;}
+.chat-input:focus{border-color:var(--accent);}
+.chat-input::placeholder{color:var(--text3);}
+.chat-suggestions{padding:8px 16px 0;display:flex;gap:6px;flex-wrap:wrap;}
+.sug{font-size:11px;padding:4px 10px;border-radius:20px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;transition:all .15s;}
+.sug:hover{border-color:var(--accent);color:var(--accent);background:var(--accent-l);}
+.api-note{font-size:11px;color:var(--text3);padding:6px 16px;text-align:center;border-top:1px solid var(--border);}
+.api-key-row{padding:12px 16px;border-bottom:1px solid var(--border);background:var(--gold-l);display:flex;align-items:center;gap:8px;flex-wrap:wrap;}
+.api-key-row label{font-size:12px;color:#7A5C0A;font-weight:500;white-space:nowrap;}
+.api-key-input{flex:1;min-width:200px;background:#fff;border:1px solid #E8C84A;border-radius:var(--r-sm);padding:6px 10px;font-family:var(--mono);font-size:12px;color:var(--text);outline:none;}
+
+/* ── CTA BAR ── */
+.ctabar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px;box-shadow:var(--shadow);}
+
+/* ── BUTTONS ── */
+.btn{display:inline-flex;align-items:center;gap:5px;padding:8px 16px;background:var(--accent);border:none;border-radius:var(--r-sm);font-family:var(--font);font-size:13px;font-weight:500;color:#fff;cursor:pointer;transition:all .15s;}
+.btn:hover{background:var(--accent-d);}
 .btn:disabled{opacity:.4;cursor:not-allowed;}
-.btn2{padding:8px 14px;background:transparent;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:var(--font);font-size:13px;color:var(--text2);cursor:pointer;transition:all .15s;}
-.btn2:hover{border-color:var(--text2);color:var(--text);}
+.btn.sm{padding:6px 12px;font-size:12px;}
+.btn.outline{background:transparent;border:1px solid var(--border2);color:var(--text2);}
+.btn.outline:hover{border-color:var(--text2);color:var(--text);background:transparent;}
+.btn.gold{background:var(--gold);color:#fff;}
+.btn.gold:hover{background:#A87A0A;}
+.btn.send{padding:8px 14px;border-radius:20px;}
 .btng{background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;text-decoration:underline;font-family:var(--font);}
-.btng:hover{color:var(--accent2);}
-.note{background:var(--accent-light);border:1px solid var(--accent);border-radius:var(--r-sm);padding:10px 16px;margin:16px 24px 0;font-size:13px;color:var(--accent);font-weight:500;}
+.note{background:var(--accent-l);border:1px solid var(--accent);border-radius:var(--r-sm);padding:9px 16px;margin:12px 24px 0;font-size:13px;color:var(--accent);font-weight:500;}
 .chart-svg{display:block;width:100%;overflow:visible;}
-@media(max-width:640px){
+
+@media(max-width:680px){
   .kgrid{grid-template-columns:1fr 1fr;}
   .cgrid{grid-template-columns:1fr;}
   .cfull{grid-column:1;}
+  .modules-grid{grid-template-columns:1fr;}
   .main{padding:16px 12px 48px;}
-  .header{padding:0 12px;}
+  .hdr{padding:0 12px;}
   .ns span{display:none;}
 }
 </style>
@@ -141,9 +211,11 @@ select:focus{border-color:var(--accent);}
 <body>
 <div id="app"></div>
 <script>
-// ── CONSTANTS ─────────────────────────────────────────────────────────────────
-const TOTAL = 12000000;
-const CLIENTES = [
+// ═══════════════════════════════════════════════════════════════════════════
+// DATA
+// ═══════════════════════════════════════════════════════════════════════════
+var TOTAL = 12000000;
+var CLIENTES = [
   {nombre:'ElectroMax SA',       pct:.30,margen:.20,categoria:'Celulares'},
   {nombre:'HogarPlus SRL',       pct:.15,margen:.30,categoria:'Línea blanca'},
   {nombre:'Distribuidora Norte', pct:.07,margen:.35,categoria:'Varios'},
@@ -154,459 +226,681 @@ const CLIENTES = [
   {nombre:'MiniMarket 24hs',     pct:.05,margen:.35,categoria:'Varios'},
   {nombre:'El Buen Precio',      pct:.05,margen:.35,categoria:'Varios'},
   {nombre:'Resto clientes',      pct:.09,margen:.35,categoria:'Varios'},
-].map(c=>({...c,ventas:Math.round(TOTAL*c.pct),costo:Math.round(TOTAL*c.pct*(1-c.margen)),ganancia:Math.round(TOTAL*c.pct*c.margen)}));
+].map(function(c){return Object.assign({},c,{
+  ventas:Math.round(TOTAL*c.pct),
+  costo:Math.round(TOTAL*c.pct*(1-c.margen)),
+  ganancia:Math.round(TOTAL*c.pct*c.margen)
+});});
 
-const MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
-const FACT=[.065,.060,.080,.075,.085,.080,.090,.088,.082,.095,.105,.095];
-const DATA_M=MESES.map((mes,i)=>({mes,ventas:Math.round(TOTAL*FACT[i]),costos:Math.round(TOTAL*FACT[i]*.724)}));
-const DATA_T=[
-  {mes:'Q1',ventas:DATA_M.slice(0,3).reduce((s,d)=>s+d.ventas,0),costos:DATA_M.slice(0,3).reduce((s,d)=>s+d.costos,0)},
-  {mes:'Q2',ventas:DATA_M.slice(3,6).reduce((s,d)=>s+d.ventas,0),costos:DATA_M.slice(3,6).reduce((s,d)=>s+d.costos,0)},
-  {mes:'Q3',ventas:DATA_M.slice(6,9).reduce((s,d)=>s+d.ventas,0),costos:DATA_M.slice(6,9).reduce((s,d)=>s+d.costos,0)},
-  {mes:'Q4',ventas:DATA_M.slice(9,12).reduce((s,d)=>s+d.ventas,0),costos:DATA_M.slice(9,12).reduce((s,d)=>s+d.costos,0)},
+var MESES=['Ene','Feb','Mar','Abr','May','Jun','Jul','Ago','Sep','Oct','Nov','Dic'];
+var FACT=[.065,.060,.080,.075,.085,.080,.090,.088,.082,.095,.105,.095];
+var DATA_M=MESES.map(function(mes,i){return{mes:mes,ventas:Math.round(TOTAL*FACT[i]),costos:Math.round(TOTAL*FACT[i]*.724)};});
+var DATA_T=[
+  {mes:'Q1',ventas:DATA_M.slice(0,3).reduce(function(s,d){return s+d.ventas;},0),costos:DATA_M.slice(0,3).reduce(function(s,d){return s+d.costos;},0)},
+  {mes:'Q2',ventas:DATA_M.slice(3,6).reduce(function(s,d){return s+d.ventas;},0),costos:DATA_M.slice(3,6).reduce(function(s,d){return s+d.costos;},0)},
+  {mes:'Q3',ventas:DATA_M.slice(6,9).reduce(function(s,d){return s+d.ventas;},0),costos:DATA_M.slice(6,9).reduce(function(s,d){return s+d.costos;},0)},
+  {mes:'Q4',ventas:DATA_M.slice(9,12).reduce(function(s,d){return s+d.ventas;},0),costos:DATA_M.slice(9,12).reduce(function(s,d){return s+d.costos;},0)},
 ];
 
-const CATS=[
-  {v:'',        l:'— Sin categoría —', b:''},
-  {v:'fecha',   l:'📅 Fecha',          b:'cf'},
-  {v:'ventas',  l:'💰 Ventas',         b:'cv'},
-  {v:'costos',  l:'📦 Costos',         b:'cc'},
-  {v:'cliente', l:'👤 Cliente',        b:'ccl'},
-  {v:'producto',l:'🏷️ Producto',       b:'cp'},
-  {v:'cantidad',l:'🔢 Cantidad',       b:'cq'},
+// Cascade financiero de ejemplo
+var CASCADE = {
+  ventas: 12000000,
+  costosDirectos: 1440000,   // fletes, comisiones (12%)
+  costosVariables: 6840000,  // materia prima + MOD (57%)
+  costosFijos: 1560000,      // sueldos, alquiler, servicios (13%)
+};
+CASCADE.margenBruto = CASCADE.ventas - CASCADE.costosDirectos;
+CASCADE.margenContrib = CASCADE.margenBruto - CASCADE.costosVariables;
+CASCADE.resultadoOp = CASCADE.margenContrib - CASCADE.costosFijos;
+
+var CATS=[
+  {v:'',l:'— Sin categoría —',b:''},
+  {v:'fecha',l:'📅 Fecha',b:'cf'},
+  {v:'ventas',l:'💰 Ventas',b:'cv'},
+  {v:'costos',l:'📦 Costos',b:'cc'},
+  {v:'cliente',l:'👤 Cliente',b:'ccl'},
+  {v:'producto',l:'🏷️ Producto',b:'cp'},
+  {v:'cantidad',l:'🔢 Cantidad',b:'cq'},
 ];
 
-const DEMO_CSV = 'Mes\tCliente\tCategoria\tVentas\tCostos\nEne\tElectroMax SA\tCelulares\t300000\t240000\nFeb\tHogarPlus SRL\tLinea blanca\t150000\t105000\nMar\tDistribuidora Norte\tVarios\t84000\t54600\nAbr\tAlmacen Central\tVarios\t84000\t54600\nMay\tKiosco del Centro\tVarios\t72000\t46800';
+var MODULES = [
+  {id:'ventas',    icon:'📊', title:'Ventas',                    desc:'Facturación por cliente, producto y fecha.',          tag:'Requerido', tagClass:'tag-req', freq:'Mensual'},
+  {id:'directos',  icon:'🚚', title:'Costos directos x cliente', desc:'Fletes, comisiones, descuentos, financiación.',       tag:'Requerido', tagClass:'tag-req', freq:'Mensual'},
+  {id:'receta',    icon:'⚙️',  title:'Receta por producto',       desc:'Insumos y cantidad por unidad fabricada.',            tag:'Opcional',  tagClass:'tag-opt', freq:'Una vez'},
+  {id:'manoobra',  icon:'👷', title:'Mano de obra directa',      desc:'Horas por sector y costo por hora mensual.',          tag:'Opcional',  tagClass:'tag-opt', freq:'Mensual'},
+  {id:'fijos',     icon:'🏢', title:'Costos fijos',              desc:'Sueldos, alquiler, servicios, amortizaciones.',       tag:'Requerido', tagClass:'tag-req', freq:'Mensual'},
+];
 
-// ── STATE ─────────────────────────────────────────────────────────────────────
+var DEMO_VENTAS='Fecha\tCliente\tProducto\tCategoria\tPrecio_Unit\tCantidad\tTotal\nEne-2024\tElectroMax SA\tiPhone 15\tCelulares\t350000\t10\t3500000\nEne-2024\tHogarPlus SRL\tHeladera 320L\tLínea blanca\t180000\t6\t1080000\nFeb-2024\tKiosco del Centro\tArroz 1kg\tAlimentos\t850\t200\t170000\nFeb-2024\tDistribuidora Norte\tDetergente 1L\tLimpieza\t1200\t150\t180000\nMar-2024\tAlmacén Central\tCoca Cola 2L\tBebidas\t1500\t100\t150000';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STATE
+// ═══════════════════════════════════════════════════════════════════════════
 var S = {
   step: 1,
-  csvData: null,
-  fileName: '',
+  activeTab: 'dashboard',
+  files: {},       // {ventas:{headers,rows,name}, directos:{...}, ...}
   mapping: {},
   mappingSaved: false,
   periodo: 'mensual',
   pasteText: '',
-  tip: null
+  tip: null,
+  chatMsgs: [
+    {role:'ai', text:'¡Hola! Soy tu asistente de gestión. Podés preguntarme sobre tus ventas, márgenes, clientes o cualquier número del dashboard. ¿En qué te ayudo?'}
+  ],
+  chatInput: '',
+  apiKey: '',
+  chatLoading: false,
 };
 
-function setState(patch) {
-  Object.assign(S, patch);
-  render();
+function setState(patch){Object.assign(S,patch);render();}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// UTILS
+// ═══════════════════════════════════════════════════════════════════════════
+function fmtK(n){return n>=1000000?'$'+(n/1e6).toFixed(1)+'M':'$'+(n/1000).toFixed(0)+'K';}
+function fmtPct(n){return n.toFixed(1)+'%';}
+function pct(a,b){return b?Math.round(a/b*100):0;}
+
+function guessCategory(col){
+  var n=col.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if(/fecha|date|mes|periodo/.test(n))return'fecha';
+  if(/venta|ingreso|precio|importe|total|factura/.test(n))return'ventas';
+  if(/costo|gasto|cmp/.test(n))return'costos';
+  if(/cliente|razon|empresa|nombre/.test(n))return'cliente';
+  if(/producto|articulo|item|categoria/.test(n))return'producto';
+  if(/cantidad|qty|unidad/.test(n))return'cantidad';
+  return'';
 }
 
-// ── UTILS ─────────────────────────────────────────────────────────────────────
-function fmtK(n) {
-  return n >= 1000000 ? '$' + (n/1e6).toFixed(1) + 'M' : '$' + (n/1000).toFixed(0) + 'K';
-}
-
-function guessCategory(col) {
-  var n = col.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  if (/fecha|date|mes|periodo/.test(n)) return 'fecha';
-  if (/venta|ingreso|precio|importe|total|factura/.test(n)) return 'ventas';
-  if (/costo|gasto|cmp/.test(n)) return 'costos';
-  if (/cliente|razon|empresa|nombre/.test(n)) return 'cliente';
-  if (/producto|articulo|item|categoria/.test(n)) return 'producto';
-  if (/cantidad|qty|unidad/.test(n)) return 'cantidad';
-  return '';
-}
-
-function parseCSV(text) {
-  var lines = text.trim().split('\n').filter(function(l){ return l.trim(); });
-  if (lines.length < 2) return null;
-  var sep = lines[0].indexOf('\t') >= 0 ? '\t' : lines[0].indexOf(';') >= 0 ? ';' : ',';
-  var headers = lines[0].split(sep).map(function(h){ return h.trim().replace(/^["']|["']$/g,''); });
-  var rows = lines.slice(1).map(function(l) {
-    var vals = l.split(sep).map(function(v){ return v.trim().replace(/^["']|["']$/g,''); });
-    var row = {};
-    headers.forEach(function(h,i){ row[h] = vals[i] || ''; });
-    return row;
+function parseCSV(text){
+  var lines=text.trim().split('\n').filter(function(l){return l.trim();});
+  if(lines.length<2)return null;
+  var sep=lines[0].indexOf('\t')>=0?'\t':lines[0].indexOf(';')>=0?';':',';
+  var headers=lines[0].split(sep).map(function(h){return h.trim().replace(/^["']|["']$/g,'');});
+  var rows=lines.slice(1).map(function(l){
+    var vals=l.split(sep).map(function(v){return v.trim().replace(/^["']|["']$/g,'');});
+    var row={};headers.forEach(function(h,i){row[h]=vals[i]||'';});return row;
   });
-  return { headers: headers, rows: rows };
+  return{headers:headers,rows:rows};
 }
 
-function mappedCount() {
-  return Object.values(S.mapping).filter(function(v){ return v && v !== ''; }).length;
-}
+function getMgC(p){return p>=35?'mgh':p>=28?'mgm':'mgl';}
+function loadedCount(){return Object.keys(S.files).length;}
+function mappedCount(){return Object.values(S.mapping).filter(function(v){return v&&v!=='';}).length;}
 
-function getMgClass(p) {
-  return p >= 35 ? 'mgh' : p >= 28 ? 'mgm' : 'mgl';
-}
-
-// ── TEMPLATE DOWNLOAD ─────────────────────────────────────────────────────────
-function downloadTemplate() {
-  var wb = XLSX.utils.book_new();
-  // Sheet 1: template vacío
-  var wsEmpty = XLSX.utils.aoa_to_sheet([
-    ['Fecha','Cliente','Producto','Categoria','Ventas','Costos','Cantidad']
-  ]);
-  wsEmpty['!cols'] = [{wch:12},{wch:24},{wch:20},{wch:16},{wch:12},{wch:12},{wch:10}];
-  XLSX.utils.book_append_sheet(wb, wsEmpty, 'Datos');
-  // Sheet 2: ejemplo con 5 filas
-  var wsEjemplo = XLSX.utils.aoa_to_sheet([
-    ['Fecha','Cliente','Producto','Categoria','Ventas','Costos','Cantidad'],
-    ['Ene-2024','ElectroMax SA','iPhone 15','Celulares',350000,280000,5],
-    ['Ene-2024','HogarPlus SRL','Heladera Kohinoor','Línea blanca',180000,126000,3],
-    ['Feb-2024','Kiosco del Centro','Coca Cola 2L','Bebidas',45000,29000,150],
-    ['Feb-2024','Distribuidora Norte','Detergente 1L','Limpieza',32000,20000,80],
-    ['Mar-2024','AlmacénCentral','Arroz 1kg','Alimentos',28000,18000,200],
-  ]);
-  wsEjemplo['!cols'] = [{wch:12},{wch:24},{wch:22},{wch:16},{wch:12},{wch:12},{wch:10}];
-  XLSX.utils.book_append_sheet(wb, wsEjemplo, 'Ejemplo');
-  XLSX.writeFile(wb, 'template_gestionpyme.xlsx');
-}
-
-// ── SVG CHARTS ────────────────────────────────────────────────────────────────
-function renderAreaChart(data, w, h) {
-  var pad = {t:10, r:10, b:28, l:56};
-  var cw = w - pad.l - pad.r;
-  var ch = h - pad.t - pad.b;
-  var maxV = Math.max.apply(null, data.map(function(d){ return d.ventas; })) * 1.1;
-  var xs = data.map(function(_,i){ return pad.l + i/(data.length-1)*cw; });
-  function yv(d){ return pad.t + ch - (d.ventas/maxV)*ch; }
-  function yc(d){ return pad.t + ch - (d.costos/maxV)*ch; }
-
-  var pathV = 'M' + xs.map(function(x,i){ return x.toFixed(1)+','+yv(data[i]).toFixed(1); }).join('L');
-  var pathC = 'M' + xs.map(function(x,i){ return x.toFixed(1)+','+yc(data[i]).toFixed(1); }).join('L');
-  var fillV = pathV + 'L'+(xs[xs.length-1].toFixed(1))+','+(pad.t+ch)+'L'+(xs[0].toFixed(1))+','+(pad.t+ch)+'Z';
-  var fillC = pathC + 'L'+(xs[xs.length-1].toFixed(1))+','+(pad.t+ch)+'L'+(xs[0].toFixed(1))+','+(pad.t+ch)+'Z';
-
-  var yticks = [0,.25,.5,.75,1].map(function(p){
-    return {y:(pad.t+ch-p*ch).toFixed(1), val:fmtK(maxV*p)};
-  });
-
-  var tipHtml = '';
-  if (S.tip) {
-    var tx = Math.min(S.tip.x + 8, w - 128);
-    var ty = Math.max(S.tip.y - 10, pad.t);
-    tipHtml = '<line x1="'+S.tip.x+'" y1="'+pad.t+'" x2="'+S.tip.x+'" y2="'+(pad.t+ch)+'" stroke="#CBC4BB" stroke-width="1"/>'
-      + '<rect x="'+tx+'" y="'+ty+'" width="120" height="72" rx="6" fill="#FDFCFA" stroke="#E2DDD6" stroke-width="1"/>'
-      + '<text x="'+(tx+8)+'" y="'+(ty+16)+'" font-size="11" font-weight="600" fill="#1A1714" font-family="DM Sans,sans-serif">'+S.tip.d.mes+'</text>'
-      + '<text x="'+(tx+8)+'" y="'+(ty+32)+'" font-size="11" fill="#2A5C45" font-family="DM Sans,sans-serif">Ventas: '+fmtK(S.tip.d.ventas)+'</text>'
-      + '<text x="'+(tx+8)+'" y="'+(ty+47)+'" font-size="11" fill="#C4531A" font-family="DM Sans,sans-serif">Costos: '+fmtK(S.tip.d.costos)+'</text>'
-      + '<text x="'+(tx+8)+'" y="'+(ty+62)+'" font-size="11" fill="#2A5C45" font-weight="600" font-family="DM Sans,sans-serif">Margen: '+Math.round((1-S.tip.d.costos/S.tip.d.ventas)*100)+'%</text>';
+// ═══════════════════════════════════════════════════════════════════════════
+// TEMPLATE DOWNLOADS
+// ═══════════════════════════════════════════════════════════════════════════
+function dlTemplate(id){
+  var wb=XLSX.utils.book_new();
+  if(id==='ventas'){
+    var ws=XLSX.utils.aoa_to_sheet([['Fecha','Cliente','Producto','Categoria','Precio_Unitario','Cantidad','Total']]);
+    var wsEx=XLSX.utils.aoa_to_sheet([
+      ['Fecha','Cliente','Producto','Categoria','Precio_Unitario','Cantidad','Total'],
+      ['Ene-2024','Cliente A','Producto X','Electrónica',15000,10,150000],
+      ['Ene-2024','Cliente B','Producto Y','Línea blanca',25000,5,125000],
+      ['Feb-2024','Cliente A','Producto Z','Alimentos',500,200,100000],
+    ]);
+    XLSX.utils.book_append_sheet(wb,ws,'Ventas');
+    XLSX.utils.book_append_sheet(wb,wsEx,'Ejemplo');
+    XLSX.writeFile(wb,'template_ventas.xlsx');
+  } else if(id==='directos'){
+    var cats=[['Categorías estándar costos directos'],['Flete y logística'],['Comisiones de venta'],['Embalaje y packaging'],['Descuentos comerciales'],['Financiación y cobranza'],['Garantías y devoluciones']];
+    var ws2=XLSX.utils.aoa_to_sheet([['Fecha','Cliente','Categoria','Concepto','Monto']]);
+    var wsC=XLSX.utils.aoa_to_sheet(cats);
+    var wsEx2=XLSX.utils.aoa_to_sheet([
+      ['Fecha','Cliente','Categoria','Concepto','Monto'],
+      ['Ene-2024','Cliente A','Flete y logística','Envío zona norte',8500],
+      ['Ene-2024','Cliente B','Comisiones de venta','Comisión vendedor 3%',3750],
+      ['Feb-2024','Cliente A','Embalaje y packaging','Cajas reforzadas',1200],
+    ]);
+    XLSX.utils.book_append_sheet(wb,ws2,'Costos Directos');
+    XLSX.utils.book_append_sheet(wb,wsEx2,'Ejemplo');
+    XLSX.utils.book_append_sheet(wb,wsC,'Categorías');
+    XLSX.writeFile(wb,'template_costos_directos.xlsx');
+  } else if(id==='receta'){
+    var ws3=XLSX.utils.aoa_to_sheet([['Producto','Insumo','Unidad','Cantidad_por_unidad','Costo_unitario_insumo']]);
+    var wsEx3=XLSX.utils.aoa_to_sheet([
+      ['Producto','Insumo','Unidad','Cantidad_por_unidad','Costo_unitario_insumo'],
+      ['Silla Modelo A','Madera pino','kg',2.5,800],
+      ['Silla Modelo A','Tornillos acero','unid',12,15],
+      ['Silla Modelo A','Pintura base','litro',0.3,1200],
+      ['Mesa Modelo B','Madera roble','kg',5,1500],
+    ]);
+    XLSX.utils.book_append_sheet(wb,ws3,'Receta');
+    XLSX.utils.book_append_sheet(wb,wsEx3,'Ejemplo');
+    XLSX.writeFile(wb,'template_receta_producto.xlsx');
+  } else if(id==='manoobra'){
+    var ws4=XLSX.utils.aoa_to_sheet([['Mes','Sector','Empleados','Horas_trabajadas','Costo_hora']]);
+    var wsEx4=XLSX.utils.aoa_to_sheet([
+      ['Mes','Sector','Empleados','Horas_trabajadas','Costo_hora'],
+      ['Ene-2024','Producción',8,1360,850],
+      ['Ene-2024','Calidad',2,340,1100],
+      ['Feb-2024','Producción',8,1360,850],
+    ]);
+    XLSX.utils.book_append_sheet(wb,ws4,'Mano de Obra');
+    XLSX.utils.book_append_sheet(wb,wsEx4,'Ejemplo');
+    XLSX.writeFile(wb,'template_mano_obra.xlsx');
+  } else if(id==='fijos'){
+    var cats2=[
+      ['Categorías estándar costos fijos'],
+      ['Sueldos administrativos'],['Sueldos operativos'],
+      ['Alquiler y expensas'],['Servicios (luz/gas/internet)'],
+      ['Amortización de equipos'],['Mantenimiento'],
+      ['Seguros'],['Honorarios profesionales'],
+      ['Marketing y publicidad'],['Impuestos y tasas'],
+    ];
+    var ws5=XLSX.utils.aoa_to_sheet([['Mes','Concepto','Categoria','Monto']]);
+    var wsEx5=XLSX.utils.aoa_to_sheet([
+      ['Mes','Concepto','Categoria','Monto'],
+      ['Ene-2024','Sueldo administrativo x3','Sueldos administrativos',450000],
+      ['Ene-2024','Sueldo operarios x8','Sueldos operativos',960000],
+      ['Ene-2024','Alquiler planta','Alquiler y expensas',180000],
+      ['Ene-2024','Electricidad planta','Servicios (luz/gas/internet)',85000],
+      ['Ene-2024','Internet y telefonía','Servicios (luz/gas/internet)',12000],
+    ]);
+    XLSX.utils.book_append_sheet(wb,ws5,'Costos Fijos');
+    XLSX.utils.book_append_sheet(wb,wsEx5,'Ejemplo');
+    XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(cats2),'Categorías');
+    XLSX.writeFile(wb,'template_costos_fijos.xlsx');
   }
-
-  return '<svg viewBox="0 0 '+w+' '+h+'" class="chart-svg" style="height:'+h+'px" onmouseleave="clearTip()">'
-    + '<defs>'
-    + '<linearGradient id="gv" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stop-color="#2A5C45" stop-opacity="0.15"/><stop offset="95%" stop-color="#2A5C45" stop-opacity="0.02"/></linearGradient>'
-    + '<linearGradient id="gc" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stop-color="#C4531A" stop-opacity="0.12"/><stop offset="95%" stop-color="#C4531A" stop-opacity="0.02"/></linearGradient>'
-    + '</defs>'
-    + yticks.map(function(t){
-        return '<line x1="'+pad.l+'" y1="'+t.y+'" x2="'+(pad.l+cw)+'" y2="'+t.y+'" stroke="#E2DDD6" stroke-dasharray="3 3"/>'
-          + '<text x="'+(pad.l-6)+'" y="'+t.y+'" text-anchor="end" dominant-baseline="central" fill="#9E9892" font-size="10" font-family="DM Mono,monospace">'+t.val+'</text>';
-      }).join('')
-    + data.map(function(d,i){
-        return '<text x="'+xs[i].toFixed(1)+'" y="'+(pad.t+ch+16)+'" text-anchor="middle" fill="#9E9892" font-size="10" font-family="DM Sans,sans-serif">'+d.mes+'</text>';
-      }).join('')
-    + '<path d="'+fillV+'" fill="url(#gv)"/>'
-    + '<path d="'+fillC+'" fill="url(#gc)"/>'
-    + '<path d="'+pathV+'" fill="none" stroke="#2A5C45" stroke-width="2" stroke-linejoin="round"/>'
-    + '<path d="'+pathC+'" fill="none" stroke="#C4531A" stroke-width="2" stroke-linejoin="round"/>'
-    + xs.map(function(x,i){
-        var d = data[i];
-        var ty2 = Math.min(yv(d), yc(d));
-        return '<rect x="'+(x-14).toFixed(1)+'" y="'+pad.t+'" width="28" height="'+ch+'" fill="transparent"'
-          + ' onmouseenter="showTip('+x.toFixed(1)+','+ty2.toFixed(1)+','+JSON.stringify(d)+')"/>';
-      }).join('')
-    + tipHtml
-    + '</svg>';
 }
 
-function renderBarChart(data, w, h) {
-  var pad = {t:10, r:10, b:36, l:56};
-  var cw = w - pad.l - pad.r;
-  var ch = h - pad.t - pad.b;
-  var maxV = Math.max.apply(null, data.map(function(d){ return d.ventas; })) * 1.1;
-  var bw = Math.floor(cw / data.length);
-  var gap = 6;
-  var bwi = Math.floor((bw - gap*3) / 2);
+// ═══════════════════════════════════════════════════════════════════════════
+// CHARTS
+// ═══════════════════════════════════════════════════════════════════════════
+function areaChart(data,w,h){
+  var pad={t:10,r:10,b:26,l:54};
+  var cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+  var maxV=Math.max.apply(null,data.map(function(d){return d.ventas;}))*1.1;
+  var xs=data.map(function(_,i){return pad.l+i/(data.length-1)*cw;});
+  function yv(d){return pad.t+ch-(d.ventas/maxV)*ch;}
+  function yc(d){return pad.t+ch-(d.costos/maxV)*ch;}
+  var pV='M'+xs.map(function(x,i){return x.toFixed(1)+','+yv(data[i]).toFixed(1);}).join('L');
+  var pC='M'+xs.map(function(x,i){return x.toFixed(1)+','+yc(data[i]).toFixed(1);}).join('L');
+  var fV=pV+'L'+xs[xs.length-1].toFixed(1)+','+(pad.t+ch)+'L'+xs[0].toFixed(1)+','+(pad.t+ch)+'Z';
+  var fC=pC+'L'+xs[xs.length-1].toFixed(1)+','+(pad.t+ch)+'L'+xs[0].toFixed(1)+','+(pad.t+ch)+'Z';
+  var yticks=[0,.25,.5,.75,1].map(function(p){return{y:(pad.t+ch-p*ch).toFixed(1),val:fmtK(maxV*p)};});
+  var tipH='';
+  if(S.tip){
+    var tx=Math.min(S.tip.x+8,w-130),ty=Math.max(S.tip.y-8,pad.t);
+    tipH='<line x1="'+S.tip.x+'" y1="'+pad.t+'" x2="'+S.tip.x+'" y2="'+(pad.t+ch)+'" stroke="#CAC4BB" stroke-width="1"/>'
+      +'<rect x="'+tx+'" y="'+ty+'" width="122" height="72" rx="6" fill="#FDFCFA" stroke="#E3DDD5"/>'
+      +'<text x="'+(tx+8)+'" y="'+(ty+15)+'" font-size="11" font-weight="600" fill="#1A1714" font-family="DM Sans,sans-serif">'+S.tip.d.mes+'</text>'
+      +'<text x="'+(tx+8)+'" y="'+(ty+30)+'" font-size="11" fill="#2A5C45" font-family="DM Sans,sans-serif">Ventas: '+fmtK(S.tip.d.ventas)+'</text>'
+      +'<text x="'+(tx+8)+'" y="'+(ty+45)+'" font-size="11" fill="#C4531A" font-family="DM Sans,sans-serif">Costos: '+fmtK(S.tip.d.costos)+'</text>'
+      +'<text x="'+(tx+8)+'" y="'+(ty+60)+'" font-size="11" fill="#2A5C45" font-weight="600" font-family="DM Sans,sans-serif">Margen: '+Math.round((1-S.tip.d.costos/S.tip.d.ventas)*100)+'%</text>';
+  }
+  return '<svg viewBox="0 0 '+w+' '+h+'" class="chart-svg" style="height:'+h+'px" onmouseleave="S.tip=null;render()">'
+    +'<defs>'
+    +'<linearGradient id="gv" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stop-color="#2A5C45" stop-opacity="0.15"/><stop offset="95%" stop-color="#2A5C45" stop-opacity="0.02"/></linearGradient>'
+    +'<linearGradient id="gc" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stop-color="#C4531A" stop-opacity="0.12"/><stop offset="95%" stop-color="#C4531A" stop-opacity="0.02"/></linearGradient>'
+    +'</defs>'
+    +yticks.map(function(t){return'<line x1="'+pad.l+'" y1="'+t.y+'" x2="'+(pad.l+cw)+'" y2="'+t.y+'" stroke="#E3DDD5" stroke-dasharray="3 3"/><text x="'+(pad.l-5)+'" y="'+t.y+'" text-anchor="end" dominant-baseline="central" fill="#9E9892" font-size="10" font-family="DM Mono,monospace">'+t.val+'</text>';}).join('')
+    +data.map(function(d,i){return'<text x="'+xs[i].toFixed(1)+'" y="'+(pad.t+ch+16)+'" text-anchor="middle" fill="#9E9892" font-size="10" font-family="DM Sans,sans-serif">'+d.mes+'</text>';}).join('')
+    +'<path d="'+fV+'" fill="url(#gv)"/><path d="'+fC+'" fill="url(#gc)"/>'
+    +'<path d="'+pV+'" fill="none" stroke="#2A5C45" stroke-width="2" stroke-linejoin="round"/>'
+    +'<path d="'+pC+'" fill="none" stroke="#C4531A" stroke-width="2" stroke-linejoin="round"/>'
+    +xs.map(function(x,i){
+      var d=data[i],ty2=Math.min(yv(d),yc(d));
+      return'<rect x="'+(x-14).toFixed(1)+'" y="'+pad.t+'" width="28" height="'+ch+'" fill="transparent" onmouseenter="S.tip={x:'+x.toFixed(1)+',y:'+ty2.toFixed(1)+',d:'+JSON.stringify(d)+'};render()"/>';
+    }).join('')
+    +tipH+'</svg>';
+}
 
-  var yticks = [0,.25,.5,.75,1].map(function(p){
-    return {y:(pad.t+ch-p*ch).toFixed(1), val:fmtK(maxV*p)};
-  });
-
+function barChart(data,w,h){
+  var pad={t:10,r:10,b:36,l:54};
+  var cw=w-pad.l-pad.r,ch=h-pad.t-pad.b;
+  var maxV=Math.max.apply(null,data.map(function(d){return d.ventas;}))*1.1;
+  var bw=Math.floor(cw/data.length),gap=6,bwi=Math.floor((bw-gap*3)/2);
+  var yticks=[0,.25,.5,.75,1].map(function(p){return{y:(pad.t+ch-p*ch).toFixed(1),val:fmtK(maxV*p)};});
   return '<svg viewBox="0 0 '+w+' '+h+'" class="chart-svg" style="height:'+h+'px">'
-    + yticks.map(function(t){
-        return '<line x1="'+pad.l+'" y1="'+t.y+'" x2="'+(pad.l+cw)+'" y2="'+t.y+'" stroke="#E2DDD6" stroke-dasharray="3 3"/>'
-          + '<text x="'+(pad.l-6)+'" y="'+t.y+'" text-anchor="end" dominant-baseline="central" fill="#9E9892" font-size="10" font-family="DM Mono,monospace">'+t.val+'</text>';
-      }).join('')
-    + data.map(function(d,i){
-        var x = pad.l + i*bw + gap;
-        var hv = Math.round((d.ventas/maxV)*ch);
-        var hg = Math.round((d.ganancia/maxV)*ch);
-        var ybase = pad.t + ch;
-        var lbl = d.seg.length > 14 ? d.seg.substring(0,13)+'…' : d.seg;
-        return '<rect x="'+x+'" y="'+(ybase-hv)+'" width="'+bwi+'" height="'+hv+'" fill="#E8F0EC" rx="3"/>'
-          + '<rect x="'+(x+bwi+gap)+'" y="'+(ybase-hg)+'" width="'+bwi+'" height="'+hg+'" fill="#2A5C45" rx="3"/>'
-          + '<text x="'+(x+bwi).toFixed(1)+'" y="'+(ybase+16)+'" text-anchor="middle" fill="#9E9892" font-size="9" font-family="DM Sans,sans-serif">'+lbl+'</text>';
-      }).join('')
-    + '</svg>';
+    +yticks.map(function(t){return'<line x1="'+pad.l+'" y1="'+t.y+'" x2="'+(pad.l+cw)+'" y2="'+t.y+'" stroke="#E3DDD5" stroke-dasharray="3 3"/><text x="'+(pad.l-5)+'" y="'+t.y+'" text-anchor="end" dominant-baseline="central" fill="#9E9892" font-size="10" font-family="DM Mono,monospace">'+t.val+'</text>';}).join('')
+    +data.map(function(d,i){
+      var x=pad.l+i*bw+gap,hv=Math.round((d.ventas/maxV)*ch),hg=Math.round((d.ganancia/maxV)*ch),yb=pad.t+ch;
+      var lbl=d.seg.length>13?d.seg.substring(0,12)+'…':d.seg;
+      return'<rect x="'+x+'" y="'+(yb-hv)+'" width="'+bwi+'" height="'+hv+'" fill="#E8F0EC" rx="3"/>'
+        +'<rect x="'+(x+bwi+gap)+'" y="'+(yb-hg)+'" width="'+bwi+'" height="'+hg+'" fill="#2A5C45" rx="3"/>'
+        +'<text x="'+(x+bwi)+'" y="'+(yb+14)+'" text-anchor="middle" fill="#9E9892" font-size="9" font-family="DM Sans,sans-serif">'+lbl+'</text>';
+    }).join('')
+    +'</svg>';
 }
 
-// ── RENDER SECTIONS ───────────────────────────────────────────────────────────
-function renderHeader() {
-  var steps = ['Importar','Categorizar','Dashboard','Chat IA'];
-  return '<div class="header">'
-    + '<div class="logo"><div class="logo-dot"></div>gestiónPyME<span class="vbadge">v1.0</span></div>'
-    + '<div class="nav">'
-    + steps.map(function(st,i){
-        var cls = S.step===i+1 ? 'active' : S.step>i+1 ? 'done' : '';
-        var click = S.step>i+1 ? ' onclick="goStep('+(i+1)+')"' : '';
-        return (i>0?'<span class="sep">›</span>':'')
-          + '<div class="ns '+cls+'"'+click+'>'
-          + '<div class="ns-n">'+(S.step>i+1?'✓':i+1)+'</div>'
-          + '<span>'+st+'</span></div>';
-      }).join('')
-    + '</div></div>';
+// ═══════════════════════════════════════════════════════════════════════════
+// RENDER SECTIONS
+// ═══════════════════════════════════════════════════════════════════════════
+function renderHeader(){
+  var steps=['Importar','Mapear','Dashboard'];
+  return '<div class="hdr">'
+    +'<div class="logo"><div class="logo-dot"></div>gestiónPyME<span class="vbadge">v1.1</span></div>'
+    +'<div class="nav">'
+    +steps.map(function(st,i){
+      var cls=S.step===i+1?'active':S.step>i+1?'done':'';
+      var click=S.step>i+1?' onclick="goStep('+(i+1)+')"':'';
+      return(i>0?'<span class="sep">›</span>':'')
+        +'<div class="ns '+cls+'"'+click+'>'
+        +'<div class="ns-n">'+(S.step>i+1?'✓':i+1)+'</div>'
+        +'<span>'+st+'</span></div>';
+    }).join('')
+    +'</div></div>';
 }
 
-function renderStep1() {
+function renderStep1(){
+  var loaded=loadedCount();
   return '<div class="card">'
-    + '<div class="card-hdr">'
-    + '<div class="slabel">Paso 1 de 3</div>'
-    + '<div class="stitle">Importá tus datos</div>'
-    + '<div class="ssub">Subí un Excel o CSV, o pegá tu tabla desde Google Sheets</div>'
-    + '</div>'
-    + '<div class="template-box">'
-    + '<div class="template-txt">📥 <strong>¿Primera vez?</strong> Descargá el template, completalo y volvé a subirlo. Incluye una pestaña de ejemplo.</div>'
-    + '<button class="btn" onclick="downloadTemplate()" style="white-space:nowrap;flex-shrink:0">Descargar template</button>'
-    + '</div>'
-    + '<div class="dropzone" id="dz" ondragover="event.preventDefault();document.getElementById(\'dz\').classList.add(\'drag\')" ondragleave="document.getElementById(\'dz\').classList.remove(\'drag\')" ondrop="handleDrop(event)">'
-    + '<input type="file" id="fi" accept=".csv,.xlsx,.xls,.txt" onchange="handleFileInput(event)">'
-    + '<div class="dicon">📂</div>'
-    + '<div class="dtitle">Arrastrá tu archivo o hacé click para buscar</div>'
-    + '<div class="dsub">La primera fila debe contener los nombres de columna</div>'
-    + '<div class="ftags"><span class="ftag">.xlsx</span><span class="ftag">.xls</span><span class="ftag">.csv</span><span class="ftag">.txt</span></div>'
-    + '</div>'
-    + '<div class="divrow"><div class="divline"></div><div class="divtxt">o pegá tu tabla</div><div class="divline"></div></div>'
-    + '<div class="paste-wrap">'
-    + '<div class="paste-lbl">Copiá desde Excel / Google Sheets y pegá acá:</div>'
-    + '<textarea id="ta" placeholder="Fecha&#9;Cliente&#9;Ventas&#9;Costos&#10;Ene&#9;ElectroMax SA&#9;300000&#9;240000&#10;..." oninput="S.pasteText=this.value">'+S.pasteText+'</textarea>'
-    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:12px">'
-    + '<button class="btng" onclick="loadDemo()">Cargar datos de ejemplo →</button>'
-    + '<button class="btn" onclick="processPaste()"'+(S.pasteText.trim()?'':' disabled')+'>Procesar →</button>'
-    + '</div></div></div>';
+    +'<div class="card-hdr">'
+    +'<div class="slabel">Paso 1 de 3</div>'
+    +'<div class="stitle">Cargá tus archivos de datos</div>'
+    +'<div class="ssub">Cada módulo tiene su propio template. Cargá los requeridos para continuar.</div>'
+    +'</div>'
+    +'<div class="tpl-bar">'
+    +'<div class="tpl-txt">📥 <strong>Primera vez:</strong> descargá cada template, completalo con tus datos y volvé a subirlo. Incluyen pestaña de ejemplo y categorías estándar.</div>'
+    +'</div>'
+    +'<div class="modules-grid">'
+    +MODULES.map(function(m){
+      var f=S.files[m.id];
+      return '<div class="mod'+(f?' loaded':'')+(m.tagClass==='tag-opt'?' optional':'')+'">'
+        +'<div class="mod-icon">'+m.icon+'</div>'
+        +'<div class="mod-title">'+m.title+'</div>'
+        +'<span class="mod-tag '+m.tagClass+'">'+m.tag+' · '+m.freq+'</span>'
+        +'<div class="mod-desc">'+m.desc+'</div>'
+        +'<div class="mod-btns">'
+        +'<button class="btn sm gold" onclick="dlTemplate(\''+m.id+'\')">⬇ Template</button>'
+        +'<div class="dropzone" style="flex:1;min-width:80px">'
+        +'<input type="file" accept=".csv,.xlsx,.xls,.txt" onchange="handleModFile(event,\''+m.id+'\')">'
+        +(f?'📎 '+f.name:'📂 Subir')
+        +'</div>'
+        +'</div>'
+        +(f?'<div class="mod-status">✓ '+f.rows.length+' filas cargadas</div>':'')
+        +'</div>';
+    }).join('')
+    +'</div>'
+    +'<div class="paste-section">'
+    +'<div class="divrow"><div class="divline"></div><div class="divtxt">o cargá ventas pegando texto</div><div class="divline"></div></div>'
+    +'<textarea id="ta" placeholder="Fecha&#9;Cliente&#9;Producto&#9;Ventas&#10;Ene-2024&#9;ElectroMax&#9;iPhone&#9;350000&#10;..." oninput="S.pasteText=this.value">'+S.pasteText+'</textarea>'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:12px">'
+    +'<button class="btng" onclick="loadDemo()">Cargar datos de ejemplo →</button>'
+    +'<button class="btn" onclick="processPaste()"'+(S.pasteText.trim()?'':' disabled')+'>Procesar →</button>'
+    +'</div></div>'
+    +'<div class="ctabar" style="margin:16px 24px 20px">'
+    +'<div style="font-size:12px;color:var(--text2)">'+loaded+' de '+MODULES.length+' módulos cargados'+(loaded>=1?' — podés continuar con datos parciales':' — cargá al menos ventas')+' </div>'
+    +'<button class="btn" onclick="goStep(2)"'+(loaded>=1?'':' disabled')+'>Continuar →</button>'
+    +'</div></div>';
 }
 
-function renderStep2() {
-  var mc = mappedCount();
-  var canProceed = mc >= 2;
+function renderStep2(){
+  // Use first loaded file for mapping
+  var firstKey=Object.keys(S.files)[0];
+  var fd=S.files[firstKey]||{headers:[],rows:[]};
+  var mc=mappedCount();
   return '<div class="card">'
-    + '<div class="card-hdr">'
-    + '<div class="slabel">Paso 2 de 3</div>'
-    + '<div class="stitle">Categorizá tus columnas</div>'
-    + '<div class="ssub"><strong>'+S.fileName+'</strong> — '+S.csvData.rows.length+' filas, '+S.csvData.headers.length+' columnas. <button class="btng" onclick="goStep(1)">Cambiar archivo</button></div>'
-    + '</div>'
-    + '<div class="note">✓ Datos cargados — revisá la vista previa y categorizá cada columna</div>'
-    + '<div style="padding:16px 24px">'
-    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
-    + '<span style="font-size:13px;font-weight:600">Vista previa</span>'
-    + '<span style="font-size:12px;color:var(--text3);font-family:var(--mono)">'+Math.min(4,S.csvData.rows.length)+' de '+S.csvData.rows.length+' filas</span>'
-    + '</div>'
-    + '<div class="tscroll" style="border:1px solid var(--border);border-radius:6px">'
-    + '<table><thead><tr>'+S.csvData.headers.map(function(h){ return '<th>'+h+'</th>'; }).join('')+'</tr></thead>'
-    + '<tbody>'+S.csvData.rows.slice(0,4).map(function(r){
-        return '<tr>'+S.csvData.headers.map(function(h){ return '<td>'+(r[h]||'')+'</td>'; }).join('')+'</tr>';
-      }).join('')+'</tbody></table>'
-    + (S.csvData.rows.length>4?'<div style="text-align:center;padding:6px;font-size:11px;color:var(--text3);background:var(--bg);border-top:1px solid var(--border)">+'+(S.csvData.rows.length-4)+' filas más</div>':'')
-    + '</div></div>'
-    + '<div style="padding:0 24px;border-top:1px solid var(--border);padding-top:16px">'
-    + '<div class="slabel" style="margin-bottom:4px">Capa semántica</div>'
-    + '<div style="font-size:13px;color:var(--text2);margin-bottom:4px">¿Qué representa cada columna? Detectamos '+mc+' de '+S.csvData.headers.length+' automáticamente.</div>'
-    + '</div>'
-    + '<div class="col-grid">'
-    + S.csvData.headers.map(function(col){
-        var val = S.mapping[col] || '';
-        var cat = CATS.find(function(c){ return c.v === val; });
-        var sample = S.csvData.rows.slice(0,3).map(function(r){ return r[col]; }).filter(Boolean).join(', ');
-        return '<div class="col-card'+(val?' mapped':'')+'">'
-          + '<div class="col-name" title="'+col+'">'+col+'</div>'
-          + '<div class="col-sample">ej: '+(sample||'—')+'</div>'
-          + '<select onchange="setMap(\''+col+'\',this.value)">'
-          + CATS.map(function(c){ return '<option value="'+c.v+'"'+(val===c.v?' selected':'')+'>'+c.l+'</option>'; }).join('')
-          + '</select>'
-          + (val&&cat?'<div class="cbadge '+cat.b+'">'+cat.l+'</div>':'')
-          + '</div>';
-      }).join('')
-    + '</div>'
-    + '<div class="mapsumm">'
-    + '<h4>Resumen del mapeo</h4>'
-    + '<div class="maptags">'
-    + CATS.slice(1).map(function(cat){
-        var cols = S.csvData.headers.filter(function(h){ return S.mapping[h]===cat.v; });
-        if (!cols.length) return '';
-        return '<span class="cbadge '+cat.b+'" style="padding:4px 10px;font-size:12px">'+cat.l+': '+cols.join(', ')+'</span>';
-      }).join('')
-    + (mc===0?'<span style="font-size:13px;color:var(--text3)">Sin columnas categorizadas todavía</span>':'')
-    + '</div></div>'
-    + '<div class="'+(S.mappingSaved?'save-banner saved':'save-banner')+'">'
-    + '<span>'+(S.mappingSaved?'✓ Segmentación guardada — podés continuar al dashboard':'Guardá la segmentación antes de continuar')+'</span>'
-    + '<div style="display:flex;gap:8px">'
-    + (S.mappingSaved
-        ? '<button class="btn2" onclick="goStep(1)" style="background:#fff">← Volver</button><button class="btn" onclick="goStep(3)">Ver Dashboard →</button>'
-        : '<button class="btn2" onclick="goStep(1)" style="border-color:rgba(255,255,255,.4);color:#fff">← Volver</button><button class="btn" onclick="saveMapping()" style="background:#fff;color:var(--accent)"'+(canProceed?'':' disabled')+'>💾 Guardar segmentación</button>'
-      )
-    + '</div></div>'
-    + '</div>';
+    +'<div class="card-hdr">'
+    +'<div class="slabel">Paso 2 de 3</div>'
+    +'<div class="stitle">Mapeá las columnas</div>'
+    +'<div class="ssub">Revisá que cada columna esté correctamente categorizada. <button class="btng" onclick="goStep(1)">← Volver a archivos</button></div>'
+    +'</div>'
+    +(Object.keys(S.files).length?'<div class="note">✓ '+Object.keys(S.files).length+' archivo(s) cargado(s): '+Object.keys(S.files).map(function(k){return S.files[k].name;}).join(', ')+'</div>':'')
+    +'<div style="padding:16px 24px">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+    +'<span style="font-size:13px;font-weight:600">Vista previa — '+fd.name+'</span>'
+    +'<span style="font-size:11px;color:var(--text3);font-family:var(--mono)">'+Math.min(4,fd.rows.length)+' de '+fd.rows.length+' filas</span>'
+    +'</div>'
+    +'<div class="tscroll" style="border:1px solid var(--border);border-radius:6px">'
+    +'<table><thead><tr>'+fd.headers.map(function(h){return'<th>'+h+'</th>';}).join('')+'</tr></thead>'
+    +'<tbody>'+fd.rows.slice(0,4).map(function(r){return'<tr>'+fd.headers.map(function(h){return'<td>'+(r[h]||'')+'</td>';}).join('')+'</tr>';}).join('')+'</tbody></table>'
+    +(fd.rows.length>4?'<div style="text-align:center;padding:5px;font-size:11px;color:var(--text3);background:var(--bg);border-top:1px solid var(--border)">+'+(fd.rows.length-4)+' filas más</div>':'')
+    +'</div></div>'
+    +'<div style="padding:0 24px;border-top:1px solid var(--border);padding-top:14px">'
+    +'<div class="slabel" style="margin-bottom:4px">Capa semántica</div>'
+    +'<div style="font-size:13px;color:var(--text2);margin-bottom:2px">Detectamos '+mc+' de '+fd.headers.length+' columnas automáticamente.</div>'
+    +'</div>'
+    +'<div class="col-grid">'
+    +fd.headers.map(function(col){
+      var val=S.mapping[col]||'';
+      var cat=CATS.find(function(c){return c.v===val;});
+      var sample=fd.rows.slice(0,3).map(function(r){return r[col];}).filter(Boolean).join(', ');
+      return'<div class="col-card'+(val?' mapped':'')+'">'
+        +'<div class="col-name" title="'+col+'">'+col+'</div>'
+        +'<div class="col-sample">ej: '+(sample||'—')+'</div>'
+        +'<select onchange="setMap(\''+col+'\',this.value)">'
+        +CATS.map(function(c){return'<option value="'+c.v+'"'+(val===c.v?' selected':'')+'>'+c.l+'</option>';}).join('')
+        +'</select>'
+        +(val&&cat?'<div class="cbadge '+cat.b+'">'+cat.l+'</div>':'')
+        +'</div>';
+    }).join('')
+    +'</div>'
+    +'<div class="save-bar'+(S.mappingSaved?' saved':'')+'">'
+    +'<span style="font-size:13px;'+(S.mappingSaved?'color:var(--accent);font-weight:500':'color:var(--text2)')+'">'+
+      (S.mappingSaved?'✓ Mapeo guardado — podés ver el dashboard':'Guardá el mapeo para continuar')+'</span>'
+    +'<div style="display:flex;gap:8px">'
+    +'<button class="btn outline" onclick="goStep(1)">← Volver</button>'
+    +(S.mappingSaved
+      ?'<button class="btn" onclick="goStep(3)">Ver Dashboard →</button>'
+      :'<button class="btn" onclick="saveMap()"'+(mc>=1?'':' disabled')+'>💾 Guardar mapeo</button>'
+    )
+    +'</div></div></div>';
 }
 
-function renderStep3() {
-  var data = S.periodo==='mensual' ? DATA_M : DATA_T;
-  var totV = CLIENTES.reduce(function(s,c){ return s+c.ventas; },0);
-  var totG = CLIENTES.reduce(function(s,c){ return s+c.ganancia; },0);
-  var mg   = Math.round(totG/totV*100);
-  var maxV = CLIENTES[0].ventas;
-  var seg1G = CLIENTES[0].ganancia;
-  var seg3V = CLIENTES.slice(2).reduce(function(s,c){ return s+c.ventas; },0);
-  var seg3G = CLIENTES.slice(2).reduce(function(s,c){ return s+c.ganancia; },0);
-  var W = Math.min(880, (document.documentElement.clientWidth||800) - 80);
-  var Whalf = Math.round(W/2) - 40;
+function renderDashboard(){
+  var data=S.periodo==='mensual'?DATA_M:DATA_T;
+  var totV=CLIENTES.reduce(function(s,c){return s+c.ventas;},0);
+  var totG=CLIENTES.reduce(function(s,c){return s+c.ganancia;},0);
+  var maxV=CLIENTES[0].ventas;
+  var seg1G=CLIENTES[0].ganancia;
+  var seg3V=CLIENTES.slice(2).reduce(function(s,c){return s+c.ventas;},0);
+  var seg3G=CLIENTES.slice(2).reduce(function(s,c){return s+c.ganancia;},0);
+  var W=Math.min(900,(document.documentElement.clientWidth||800)-60);
+  var Wh=Math.round(W/2)-30;
 
-  var segData = [
-    {seg:'ElectroMax (30%)', ventas:CLIENTES[0].ventas, ganancia:seg1G,             mg:20},
-    {seg:'HogarPlus (15%)',  ventas:CLIENTES[1].ventas, ganancia:CLIENTES[1].ganancia, mg:30},
-    {seg:'Resto (55%)',      ventas:seg3V,               ganancia:seg3G,             mg:35},
+  var segData=[
+    {seg:'ElectroMax (30%)',ventas:CLIENTES[0].ventas,ganancia:seg1G,mg:20},
+    {seg:'HogarPlus (15%)',ventas:CLIENTES[1].ventas,ganancia:CLIENTES[1].ganancia,mg:30},
+    {seg:'Resto (55%)',ventas:seg3V,ganancia:seg3G,mg:35},
   ];
 
-  return '<div class="dbanner">📊 Datos de ejemplo — así se ve cuando cargás tu propio Excel</div>'
-    + '<div class="kgrid">'
-    + '<div class="kpi"><div class="klbl">Ventas totales</div><div class="kval">'+fmtK(totV)+'</div><div class="kdelta up">↑ 18% vs año anterior</div></div>'
-    + '<div class="kpi"><div class="klbl">Ganancia bruta</div><div class="kval">'+fmtK(totG)+'</div><div class="kdelta up">↑ 22% vs año anterior</div></div>'
-    + '<div class="kpi"><div class="klbl">Margen global</div><div class="kval warn">'+mg+'%</div><div class="kdelta warn">⚠ Arrastrado por cliente 1</div></div>'
-    + '<div class="kpi"><div class="klbl">Clientes activos</div><div class="kval">10</div><div class="kdelta up">1 cliente = 30% del total</div></div>'
-    + '</div>'
-    + '<div class="ptabs">'
-    + '<button class="ptab'+(S.periodo==='mensual'?' active':'')+'" onclick="setState({periodo:\'mensual\'})">Mensual</button>'
-    + '<button class="ptab'+(S.periodo==='trimestral'?' active':'')+'" onclick="setState({periodo:\'trimestral\'})">Trimestral</button>'
-    + '</div>'
-    + '<div class="cgrid">'
-    + '<div class="ccrd cfull">'
-    + '<div class="ctitle">Ventas vs Costos</div>'
-    + '<div class="csub">El área entre las curvas es tu margen bruto</div>'
-    + '<div class="legrow"><div class="legitem"><div class="legdot" style="background:#2A5C45"></div>Ventas</div><div class="legitem"><div class="legdot" style="background:#C4531A"></div>Costos</div></div>'
-    + renderAreaChart(data, W, 200)
-    + '</div>'
-    + '<div class="ccrd">'
-    + '<div class="ctitle">Top clientes por facturación</div>'
-    + '<div class="csub">Ventas anuales y margen por cliente</div>'
-    + '<div class="tscroll"><table><thead><tr><th>#</th><th>Cliente</th><th class="r">Ventas</th><th class="r">Margen</th></tr></thead><tbody>'
-    + CLIENTES.map(function(c,i){
-        return '<tr><td><span class="rankn">#'+(i+1)+'</span></td>'
-          + '<td><div style="font-weight:'+(i<2?500:400)+';font-size:12px">'+c.nombre+'</div>'
-          + '<div class="barinl" style="width:'+Math.round(c.ventas/maxV*100)+'%;background:'+(i===0?'#C4531A':i===1?'#E8C84A':'#2A5C45')+'"></div></td>'
-          + '<td class="r">'+fmtK(c.ventas)+'</td>'
-          + '<td class="r"><span class="mgb '+getMgClass(Math.round(c.margen*100))+'">'+Math.round(c.margen*100)+'%</span></td></tr>';
-      }).join('')
-    + '</tbody></table></div></div>'
-    + '<div class="ccrd">'
-    + '<div class="ctitle">Ganancia por segmento</div>'
-    + '<div class="csub">Dónde se genera realmente el margen</div>'
-    + '<div class="legrow"><div class="legitem"><div class="legdot" style="background:#E8F0EC;border:1px solid #2A5C45"></div>Ventas</div><div class="legitem"><div class="legdot" style="background:#2A5C45"></div>Ganancia</div></div>'
-    + renderBarChart(segData, Whalf, 180)
-    + '<div class="ibox">💡 <strong>Insight clave:</strong> ElectroMax es el 30% de tus ventas pero solo el <strong>'+Math.round(seg1G/totG*100)+'% de tu ganancia</strong>. Los clientes chicos generan el <strong>'+Math.round(seg3G/totG*100)+'% del margen total</strong>.</div>'
-    + '</div></div>'
-    + '<div class="ctabar">'
-    + '<div style="font-size:13px;color:var(--text2)">✓ Dashboard completo — Chat IA disponible próximamente</div>'
-    + '<div style="display:flex;gap:8px"><button class="btn2" onclick="goStep(2)">← Volver</button><button class="btn" disabled>Chat IA — próximamente →</button></div>'
-    + '</div>';
+  return '<div class="demo-note">📊 Datos de ejemplo — se reemplazarán con tus archivos cargados</div>'
+    +'<div class="kgrid">'
+    +'<div class="kpi"><div class="klbl">Ventas totales</div><div class="kval">'+fmtK(totV)+'</div><div class="kdelta up">↑ 18% vs año anterior</div></div>'
+    +'<div class="kpi"><div class="klbl">Margen bruto</div><div class="kval">'+fmtK(totG)+'</div><div class="kdelta up">↑ 22% vs año anterior</div></div>'
+    +'<div class="kpi"><div class="klbl">Margen global</div><div class="kval warn">'+pct(totG,totV)+'%</div><div class="kdelta warn">⚠ Arrastrado por cliente 1</div></div>'
+    +'<div class="kpi"><div class="klbl">Resultado operativo</div><div class="kval">'+fmtK(CASCADE.resultadoOp)+'</div><div class="kdelta up">'+pct(CASCADE.resultadoOp,CASCADE.ventas)+'% sobre ventas</div></div>'
+    +'</div>'
+    +'<div class="ptabs">'
+    +'<button class="ptab'+(S.periodo==='mensual'?' active':'')+'" onclick="setState({periodo:\'mensual\'})">Mensual</button>'
+    +'<button class="ptab'+(S.periodo==='trimestral'?' active':'')+'" onclick="setState({periodo:\'trimestral\'})">Trimestral</button>'
+    +'</div>'
+    +'<div class="cgrid">'
+    +'<div class="ccrd cfull">'
+    +'<div class="ctitle">Ventas vs Costos totales</div><div class="csub">Área entre curvas = margen bruto del período</div>'
+    +'<div class="legrow"><div class="legitem"><div class="legdot" style="background:#2A5C45"></div>Ventas</div><div class="legitem"><div class="legdot" style="background:#C4531A"></div>Costos</div></div>'
+    +areaChart(data,W,200)
+    +'</div>'
+    +'<div class="ccrd">'
+    +'<div class="ctitle">Cascada de margen</div><div class="csub">De ventas a resultado operativo</div>'
+    +'<table class="cascade">'
+    +'<tr><td class="lbl">Ventas brutas</td><td class="val">'+fmtK(CASCADE.ventas)+'</td></tr>'
+    +'<tr class="sub"><td class="lbl">− Costos directos por cliente</td><td class="val" style="color:var(--red)">−'+fmtK(CASCADE.costosDirectos)+'</td></tr>'
+    +'<tr class="total-row"><td class="lbl">= Margen de contribución bruto</td><td class="val">'+fmtK(CASCADE.margenBruto)+' ('+pct(CASCADE.margenBruto,CASCADE.ventas)+'%)</td></tr>'
+    +'<tr class="sub"><td class="lbl">− Costos variables (mat. prima + MOD)</td><td class="val" style="color:var(--red)">−'+fmtK(CASCADE.costosVariables)+'</td></tr>'
+    +'<tr class="total-row"><td class="lbl">= Margen de contribución neto</td><td class="val">'+fmtK(CASCADE.margenContrib)+' ('+pct(CASCADE.margenContrib,CASCADE.ventas)+'%)</td></tr>'
+    +'<tr class="sub"><td class="lbl">− Costos fijos</td><td class="val" style="color:var(--red)">−'+fmtK(CASCADE.costosFijos)+'</td></tr>'
+    +'<tr class="'+(CASCADE.resultadoOp>=0?'total-row':'warn-row')+'"><td class="lbl">= Resultado operativo</td><td class="val">'+fmtK(CASCADE.resultadoOp)+' ('+pct(CASCADE.resultadoOp,CASCADE.ventas)+'%)</td></tr>'
+    +'</table></div>'
+    +'<div class="ccrd">'
+    +'<div class="ctitle">Top clientes</div><div class="csub">Facturación y margen real</div>'
+    +'<div class="tscroll"><table><thead><tr><th>#</th><th>Cliente</th><th class="r">Ventas</th><th class="r">Margen</th></tr></thead><tbody>'
+    +CLIENTES.map(function(c,i){
+      return'<tr><td><span class="rankn">#'+(i+1)+'</span></td>'
+        +'<td><div style="font-weight:'+(i<2?500:400)+';font-size:12px">'+c.nombre+'</div>'
+        +'<div class="barinl" style="width:'+Math.round(c.ventas/maxV*100)+'%;background:'+(i===0?'#C4531A':i===1?'#E8C84A':'#2A5C45')+'"></div></td>'
+        +'<td class="r">'+fmtK(c.ventas)+'</td>'
+        +'<td class="r"><span class="mgb '+getMgC(Math.round(c.margen*100))+'">'+Math.round(c.margen*100)+'%</span></td></tr>';
+    }).join('')
+    +'</tbody></table></div></div>'
+    +'<div class="ccrd">'
+    +'<div class="ctitle">Ganancia por segmento</div><div class="csub">Dónde se genera el margen real</div>'
+    +'<div class="legrow"><div class="legitem"><div class="legdot" style="background:#E8F0EC;border:1px solid #2A5C45"></div>Ventas</div><div class="legitem"><div class="legdot" style="background:#2A5C45"></div>Ganancia</div></div>'
+    +barChart(segData,Wh,170)
+    +'<div class="ibox">💡 <strong>Insight:</strong> ElectroMax = 30% ventas pero solo <strong>'+pct(seg1G,totG)+'% de la ganancia</strong>. Los clientes chicos generan <strong>'+pct(seg3G,totG)+'% del margen total</strong>.</div>'
+    +'</div></div>';
 }
 
-// ── RENDER ────────────────────────────────────────────────────────────────────
-function render() {
-  var html = renderHeader() + '<div class="main">';
-  if (S.step===1) html += renderStep1();
-  else if (S.step===2 && S.csvData) html += renderStep2();
-  else if (S.step===3) html += renderStep3();
-  html += '</div>';
-  document.getElementById('app').innerHTML = html;
+function renderChat(){
+  var hasKey=S.apiKey&&S.apiKey.trim().length>10;
+  return '<div class="ccrd" style="margin-bottom:16px">'
+    +'<div class="ctitle">Chat IA — Preguntale a tus datos</div>'
+    +'<div class="csub">Hacé preguntas en lenguaje natural sobre tu negocio</div>'
+    +'<div class="chat-wrap">'
+    +(hasKey?''
+      :'<div class="api-key-row">'
+      +'<label>🔑 Clave API de Anthropic:</label>'
+      +'<input class="api-key-input" type="password" placeholder="sk-ant-..." value="'+S.apiKey+'" oninput="S.apiKey=this.value" />'
+      +'<a href="https://console.anthropic.com" target="_blank" style="font-size:11px;color:var(--gold)">Obtener clave →</a>'
+      +'</div>'
+    )
+    +'<div class="chat-suggestions">'
+    +['¿Cuál fue el mejor mes?','¿Qué cliente tiene más margen?','¿Cuál es mi punto de equilibrio?','Analizá mi concentración de clientes']
+      .map(function(s){return'<button class="sug" onclick="sendSuggestion(\''+s+'\')">'+s+'</button>';}).join('')
+    +'</div>'
+    +'<div class="chat-msgs" id="chat-msgs">'
+    +S.chatMsgs.map(function(m){
+      return'<div class="msg '+m.role+(m.thinking?' thinking':'')+'">'
+        +m.text.replace(/\n/g,'<br>')+'</div>';
+    }).join('')
+    +'</div>'
+    +'<div class="chat-input-row">'
+    +'<input class="chat-input" type="text" placeholder="Ej: ¿cuál fue mi margen en Q3?" value="'+S.chatInput+'"'
+    +' oninput="S.chatInput=this.value"'
+    +' onkeydown="if(event.key===\'Enter\'&&!event.shiftKey){event.preventDefault();sendChat();}">'
+    +'<button class="btn send" onclick="sendChat()"'+(S.chatLoading?' disabled':'')+'>'+( S.chatLoading?'…':'Enviar')+'</button>'
+    +'</div>'
+    +'<div class="api-note">'+(hasKey?'Conectado a Claude Sonnet 4':'Ingresá tu clave API para activar el chat IA real')+'</div>'
+    +'</div></div>';
 }
 
-// ── HANDLERS ──────────────────────────────────────────────────────────────────
-function goStep(n) {
-  setState({ step: n });
+function renderStep3(){
+  var tabs=[{id:'dashboard',l:'📊 Dashboard'},{id:'cascada',l:'📉 Margen cascada'},{id:'chat',l:'🤖 Chat IA'}];
+  return '<div class="demo-note">📊 Datos de ejemplo — así se verá con tus archivos reales</div>'
+    +'<div class="tabs">'
+    +tabs.map(function(t){return'<button class="tab'+(S.activeTab===t.id?' active':'')+'" onclick="setState({activeTab:\''+t.id+'\'})">'+t.l+'</button>';}).join('')
+    +'</div>'
+    +(S.activeTab==='dashboard'?renderDashboard():'')
+    +(S.activeTab==='cascada'?renderCascadaTab():'')
+    +(S.activeTab==='chat'?renderChat():'')
+    +'<div class="ctabar">'
+    +'<div style="font-size:13px;color:var(--text2)">gestiónPyME v1.1 — prototipo</div>'
+    +'<button class="btn outline" onclick="goStep(2)">← Volver al mapeo</button>'
+    +'</div>';
 }
 
-function setMap(col, val) {
-  S.mapping[col] = val;
-  S.mappingSaved = false;
-  render();
+function renderCascadaTab(){
+  var W=Math.min(900,(document.documentElement.clientWidth||800)-60);
+  var data=S.periodo==='mensual'?DATA_M:DATA_T;
+  // Per-month cascade (simplified)
+  var pad={t:10,r:10,b:26,l:54};
+  var cw=W-pad.l-pad.r,ch=160-pad.t-pad.b;
+  var maxV=Math.max.apply(null,data.map(function(d){return d.ventas;}))*1.1;
+  var xs=data.map(function(_,i){return pad.l+i/(data.length-1)*cw;});
+  // result = ventas - costos (aproximado)
+  var dataR=data.map(function(d){return{mes:d.mes,result:Math.round(d.ventas*0.16)};});
+  var yR=function(d){return pad.t+ch-(d.result/Math.max.apply(null,dataR.map(function(x){return x.result;}))/1.1)*ch;};
+  return '<div class="ccrd cfull" style="margin-bottom:16px">'
+    +'<div class="ctitle">Resultado operativo mensual</div>'
+    +'<div class="csub">Ingreso neto después de todos los costos</div>'
+    +'<div class="ptabs">'
+    +'<button class="ptab'+(S.periodo==='mensual'?' active':'')+'" onclick="setState({periodo:\'mensual\'})">Mensual</button>'
+    +'<button class="ptab'+(S.periodo==='trimestral'?' active':'')+'" onclick="setState({periodo:\'trimestral\'})">Trimestral</button>'
+    +'</div>'
+    +areaChart(data,W,200)
+    +'</div>'
+    +'<div class="ccrd cfull">'
+    +'<div class="ctitle">Composición de costos</div>'
+    +'<div class="csub">Estructura de costos sobre ventas totales</div>'
+    +'<table class="cascade">'
+    +'<tr class="sep-row"><td colspan="3">Desglose sobre $12M ventas</td></tr>'
+    +'<tr><td class="lbl">Costos directos por cliente</td><td class="val" style="color:var(--red)">'+fmtK(CASCADE.costosDirectos)+'</td><td class="val" style="color:var(--text3)">'+pct(CASCADE.costosDirectos,CASCADE.ventas)+'%</td></tr>'
+    +'<tr class="sub"><td class="lbl" style="padding-left:20px">· Fletes y logística</td><td class="val">'+fmtK(CASCADE.costosDirectos*.45)+'</td><td class="val" style="color:var(--text3)">5.4%</td></tr>'
+    +'<tr class="sub"><td class="lbl" style="padding-left:20px">· Comisiones de venta</td><td class="val">'+fmtK(CASCADE.costosDirectos*.30)+'</td><td class="val" style="color:var(--text3)">3.6%</td></tr>'
+    +'<tr class="sub"><td class="lbl" style="padding-left:20px">· Otros directos</td><td class="val">'+fmtK(CASCADE.costosDirectos*.25)+'</td><td class="val" style="color:var(--text3)">3.0%</td></tr>'
+    +'<tr><td class="lbl">Costos variables (mat. prima + MOD)</td><td class="val" style="color:var(--red)">'+fmtK(CASCADE.costosVariables)+'</td><td class="val" style="color:var(--text3)">'+pct(CASCADE.costosVariables,CASCADE.ventas)+'%</td></tr>'
+    +'<tr class="sub"><td class="lbl" style="padding-left:20px">· Materia prima</td><td class="val">'+fmtK(CASCADE.costosVariables*.65)+'</td><td class="val" style="color:var(--text3)">37.1%</td></tr>'
+    +'<tr class="sub"><td class="lbl" style="padding-left:20px">· Mano de obra directa</td><td class="val">'+fmtK(CASCADE.costosVariables*.35)+'</td><td class="val" style="color:var(--text3)">19.9%</td></tr>'
+    +'<tr><td class="lbl">Costos fijos</td><td class="val" style="color:var(--red)">'+fmtK(CASCADE.costosFijos)+'</td><td class="val" style="color:var(--text3)">'+pct(CASCADE.costosFijos,CASCADE.ventas)+'%</td></tr>'
+    +'<tr class="sub"><td class="lbl" style="padding-left:20px">· Sueldos administrativos y operativos</td><td class="val">'+fmtK(CASCADE.costosFijos*.60)+'</td><td class="val" style="color:var(--text3)">7.8%</td></tr>'
+    +'<tr class="sub"><td class="lbl" style="padding-left:20px">· Alquiler y servicios</td><td class="val">'+fmtK(CASCADE.costosFijos*.28)+'</td><td class="val" style="color:var(--text3)">3.6%</td></tr>'
+    +'<tr class="sub"><td class="lbl" style="padding-left:20px">· Otros fijos</td><td class="val">'+fmtK(CASCADE.costosFijos*.12)+'</td><td class="val" style="color:var(--text3)">1.6%</td></tr>'
+    +'<tr class="total-row"><td class="lbl">RESULTADO OPERATIVO</td><td class="val">'+fmtK(CASCADE.resultadoOp)+'</td><td class="val">'+pct(CASCADE.resultadoOp,CASCADE.ventas)+'%</td></tr>'
+    +'</table></div>';
 }
 
-function saveMapping() {
-  setState({ mappingSaved: true });
+// ═══════════════════════════════════════════════════════════════════════════
+// MAIN RENDER
+// ═══════════════════════════════════════════════════════════════════════════
+function render(){
+  var html=renderHeader()+'<div class="main">';
+  if(S.step===1) html+=renderStep1();
+  else if(S.step===2) html+=renderStep2();
+  else if(S.step===3) html+=renderStep3();
+  html+='</div>';
+  document.getElementById('app').innerHTML=html;
+  // scroll chat to bottom
+  var cm=document.getElementById('chat-msgs');
+  if(cm) cm.scrollTop=cm.scrollHeight;
 }
 
-function loadDemo() {
-  var ta = document.getElementById('ta');
-  if (ta) ta.value = DEMO_CSV;
-  S.pasteText = DEMO_CSV;
-  render();
-}
+// ═══════════════════════════════════════════════════════════════════════════
+// HANDLERS
+// ═══════════════════════════════════════════════════════════════════════════
+function goStep(n){setState({step:n});}
+function setMap(col,val){S.mapping[col]=val;S.mappingSaved=false;render();}
+function saveMap(){setState({mappingSaved:true});}
 
-function processPaste() {
-  var text = S.pasteText || (document.getElementById('ta') ? document.getElementById('ta').value : '');
-  if (!text.trim()) return;
-  var p = parseCSV(text);
-  if (p) {
-    var auto = {};
-    p.headers.forEach(function(h){ auto[h] = guessCategory(h); });
-    setState({ csvData: p, fileName: 'datos pegados', mapping: auto, mappingSaved: false, step: 2 });
-  } else {
-    alert('No se detectó estructura. Asegurate de incluir encabezados en la primera fila.');
-  }
-}
-
-function loadFileData(file) {
-  var ext = file.name.split('.').pop().toLowerCase();
-  if (ext==='csv' || ext==='txt') {
-    var r = new FileReader();
-    r.onload = function(e) {
-      var p = parseCSV(e.target.result);
-      if (p) {
-        var auto = {};
-        p.headers.forEach(function(h){ auto[h] = guessCategory(h); });
-        setState({ csvData: p, fileName: file.name, mapping: auto, mappingSaved: false, step: 2 });
+function loadFileData(file,modId){
+  var ext=file.name.split('.').pop().toLowerCase();
+  if(ext==='csv'||ext==='txt'){
+    var r=new FileReader();
+    r.onload=function(e){
+      var p=parseCSV(e.target.result);
+      if(p){
+        var auto={};p.headers.forEach(function(h){auto[h]=guessCategory(h);});
+        S.files[modId]=Object.assign({},p,{name:file.name});
+        if(!Object.keys(S.mapping).length) S.mapping=auto;
+        render();
       }
     };
-    r.readAsText(file, 'UTF-8');
-  } else if (ext==='xlsx' || ext==='xls') {
-    var r2 = new FileReader();
-    r2.onload = function(e) {
-      var wb = XLSX.read(e.target.result, { type:'array' });
-      var ws = wb.Sheets[wb.SheetNames[0]];
-      var json = XLSX.utils.sheet_to_json(ws, { defval:'' });
-      if (json.length > 0) {
-        var headers = Object.keys(json[0]);
-        var auto = {};
-        headers.forEach(function(h){ auto[h] = guessCategory(h); });
-        setState({ csvData:{ headers:headers, rows:json }, fileName:file.name, mapping:auto, mappingSaved:false, step:2 });
+    r.readAsText(file,'UTF-8');
+  } else if(ext==='xlsx'||ext==='xls'){
+    var r2=new FileReader();
+    r2.onload=function(e){
+      var wb=XLSX.read(e.target.result,{type:'array'});
+      var ws=wb.Sheets[wb.SheetNames[0]];
+      var json=XLSX.utils.sheet_to_json(ws,{defval:''});
+      if(json.length>0){
+        var headers=Object.keys(json[0]);
+        var auto={};headers.forEach(function(h){auto[h]=guessCategory(h);});
+        S.files[modId]={headers:headers,rows:json,name:file.name};
+        if(!Object.keys(S.mapping).length) S.mapping=auto;
+        render();
       }
     };
     r2.readAsArrayBuffer(file);
   }
 }
 
-function handleFileInput(e) {
-  if (e.target.files[0]) loadFileData(e.target.files[0]);
+function handleModFile(e,modId){
+  if(e.target.files[0]) loadFileData(e.target.files[0],modId);
 }
 
-function handleDrop(e) {
-  e.preventDefault();
-  document.getElementById('dz') && document.getElementById('dz').classList.remove('drag');
-  if (e.dataTransfer.files[0]) loadFileData(e.dataTransfer.files[0]);
+function loadDemo(){
+  var p=parseCSV(DEMO_VENTAS);
+  if(p){
+    var auto={};p.headers.forEach(function(h){auto[h]=guessCategory(h);});
+    S.files['ventas']=Object.assign({},p,{name:'demo_ventas.csv'});
+    S.mapping=auto;
+    S.pasteText=DEMO_VENTAS;
+    render();
+  }
 }
 
-function showTip(x, y, d) {
-  S.tip = { x:x, y:y, d:d };
+function processPaste(){
+  var text=S.pasteText||(document.getElementById('ta')?document.getElementById('ta').value:'');
+  if(!text.trim())return;
+  var p=parseCSV(text);
+  if(p){
+    var auto={};p.headers.forEach(function(h){auto[h]=guessCategory(h);});
+    S.files['ventas']=Object.assign({},p,{name:'datos pegados'});
+    S.mapping=auto;
+    setState({step:2});
+  } else {
+    alert('No se detectó estructura. Incluí encabezados en la primera fila.');
+  }
+}
+
+// ── CHAT ──────────────────────────────────────────────────────────────────
+function sendSuggestion(txt){
+  S.chatInput=txt;
+  sendChat();
+}
+
+function buildContext(){
+  var totV=CLIENTES.reduce(function(s,c){return s+c.ventas;},0);
+  var totG=CLIENTES.reduce(function(s,c){return s+c.ganancia;},0);
+  return 'Sos el asistente financiero de una PyME manufacturera argentina. Respondé siempre en español, de forma concisa y accionable.\n\n'
+    +'DATOS DEL NEGOCIO (demo):\n'
+    +'- Ventas totales anuales: '+fmtK(totV)+'\n'
+    +'- Ganancia bruta: '+fmtK(totG)+' ('+pct(totG,totV)+'% margen)\n'
+    +'- Resultado operativo: '+fmtK(CASCADE.resultadoOp)+' ('+pct(CASCADE.resultadoOp,CASCADE.ventas)+'%)\n'
+    +'- Costos directos: '+fmtK(CASCADE.costosDirectos)+' ('+pct(CASCADE.costosDirectos,CASCADE.ventas)+'%)\n'
+    +'- Costos variables: '+fmtK(CASCADE.costosVariables)+' ('+pct(CASCADE.costosVariables,CASCADE.ventas)+'%)\n'
+    +'- Costos fijos: '+fmtK(CASCADE.costosFijos)+' ('+pct(CASCADE.costosFijos,CASCADE.ventas)+'%)\n'
+    +'- Cliente 1 ElectroMax SA: 30% ventas, 20% margen (celulares)\n'
+    +'- Cliente 2 HogarPlus SRL: 15% ventas, 30% margen (línea blanca)\n'
+    +'- Resto clientes (8): 55% ventas, 35% margen\n'
+    +'- Mejor mes: Diciembre. Peor mes: Febrero.\n'
+    +'- Archivos cargados: '+Object.keys(S.files).join(', ')+'\n';
+}
+
+async function sendChat(){
+  var input=S.chatInput.trim();
+  if(!input||S.chatLoading)return;
+  S.chatMsgs.push({role:'user',text:input});
+  S.chatInput='';
+  S.chatLoading=true;
+  render();
+
+  var hasKey=S.apiKey&&S.apiKey.trim().length>10;
+  if(!hasKey){
+    // Respuestas demo sin API
+    var demos={
+      'mejor mes':'El mejor mes fue **Diciembre** con $1.52M en ventas (12.7% del total anual). Le sigue Noviembre con $1.35M. El último trimestre concentra el 34% de las ventas — hay estacionalidad importante.',
+      'margen':'Tu margen global es del 27.6%, arrastrado a la baja por ElectroMax (20%). Sin ese cliente, tu margen promedio sería del 34%. Te recomiendo revisar las condiciones comerciales con ElectroMax.',
+      'cliente':'ElectroMax SA es tu mayor cliente en facturación (30%) pero el de menor margen (20%). HogarPlus SRL tiene mejor relación: 15% de ventas con 30% de margen. Los 8 clientes restantes son los más rentables: 35% de margen promedio.',
+      'equilibrio':'Con costos fijos de $1.56M y margen de contribución neto del 43%, tu punto de equilibrio mensual es aproximadamente $303K en ventas. Estás operando muy por encima — buena señal.',
+    };
+    var resp='Para activar respuestas reales con IA, ingresá tu clave API de Anthropic arriba. Mientras tanto, podés usar las sugerencias rápidas de arriba que tienen respuestas de ejemplo.';
+    for(var k in demos){
+      if(input.toLowerCase().indexOf(k)>=0){resp=demos[k];break;}
+    }
+    setTimeout(function(){
+      S.chatMsgs.push({role:'ai',text:resp});
+      S.chatLoading=false;
+      render();
+    },800);
+    return;
+  }
+
+  // Real API call
+  try{
+    var messages=[];
+    S.chatMsgs.slice(0,-1).forEach(function(m){
+      if(m.role==='user'||m.role==='ai'){
+        messages.push({role:m.role==='ai'?'assistant':'user',content:m.text});
+      }
+    });
+    messages.push({role:'user',content:input});
+
+    var res=await fetch('https://api.anthropic.com/v1/messages',{
+      method:'POST',
+      headers:{'Content-Type':'application/json','x-api-key':S.apiKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},
+      body:JSON.stringify({
+        model:'claude-sonnet-4-20250514',
+        max_tokens:600,
+        system:buildContext(),
+        messages:messages
+      })
+    });
+    var data=await res.json();
+    var reply=data.content&&data.content[0]?data.content[0].text:'No pude procesar la respuesta.';
+    S.chatMsgs.push({role:'ai',text:reply});
+  } catch(err){
+    S.chatMsgs.push({role:'ai',text:'Error al conectar con la API. Verificá tu clave y la conexión.'});
+  }
+  S.chatLoading=false;
   render();
 }
 
-function clearTip() {
-  if (S.tip) { S.tip = null; render(); }
-}
-
-// ── INIT ──────────────────────────────────────────────────────────────────────
+// ── INIT ──────────────────────────────────────────────────────────────────
 render();
 </script>
 </body>
