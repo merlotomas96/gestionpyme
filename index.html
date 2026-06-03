@@ -18,31 +18,28 @@
   --r:10px;--r-sm:6px;
 }
 body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14px;line-height:1.5;min-height:100vh;}
-/* HEADER */
 .header{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;height:52px;display:flex;align-items:center;justify-content:space-between;position:sticky;top:0;z-index:100;}
 .logo{font-size:15px;font-weight:600;display:flex;align-items:center;gap:8px;}
 .logo-dot{width:8px;height:8px;background:var(--accent);border-radius:50%;}
 .vbadge{font-size:11px;font-family:var(--mono);background:var(--accent-light);color:var(--accent);padding:2px 7px;border-radius:4px;font-weight:500;}
 .nav{display:flex;gap:2px;align-items:center;}
-.ns{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text3);padding:5px 10px;border-radius:20px;cursor:pointer;white-space:nowrap;transition:all .15s;}
-.ns:hover{background:var(--bg);}
+.ns{display:flex;align-items:center;gap:5px;font-size:12px;color:var(--text3);padding:5px 10px;border-radius:20px;cursor:default;white-space:nowrap;}
 .ns.active{color:var(--accent);background:var(--accent-light);font-weight:500;}
-.ns.done{color:var(--text2);}
+.ns.done{color:var(--text2);cursor:pointer;}
+.ns.done:hover{background:var(--bg);}
 .ns-n{width:18px;height:18px;border-radius:50%;border:1px solid currentColor;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:600;flex-shrink:0;}
 .ns.done .ns-n{background:var(--accent);border-color:var(--accent);color:#fff;font-size:9px;}
 .sep{color:var(--border2);font-size:11px;padding:0 2px;}
-/* MAIN */
 .main{max-width:960px;margin:0 auto;padding:28px 24px 48px;}
-/* CARDS */
-.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
+.card{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);overflow:hidden;margin-bottom:16px;}
 .card-hdr{padding:20px 24px 16px;border-bottom:1px solid var(--border);}
 .slabel{font-size:11px;font-weight:600;letter-spacing:.08em;color:var(--accent);text-transform:uppercase;margin-bottom:4px;}
 .stitle{font-size:20px;font-weight:600;}
 .ssub{font-size:13px;color:var(--text2);margin-top:3px;}
 /* UPLOAD */
-.dropzone{margin:24px;border:1.5px dashed var(--border2);border-radius:var(--r);padding:36px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);}
-.dropzone:hover,.dropzone.drag{border-color:var(--accent);background:var(--accent-light);}
-.dropzone input{display:none;}
+.dropzone{margin:24px;border:1.5px dashed var(--border2);border-radius:var(--r);padding:36px 24px;text-align:center;cursor:pointer;transition:all .2s;background:var(--bg);position:relative;}
+.dropzone:hover{border-color:var(--accent);background:var(--accent-light);}
+.dropzone input[type=file]{position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%;}
 .dicon{font-size:28px;margin-bottom:10px;}
 .dtitle{font-size:15px;font-weight:500;margin-bottom:5px;}
 .dsub{font-size:13px;color:var(--text2);margin-bottom:16px;}
@@ -56,6 +53,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:14
 textarea{width:100%;background:var(--bg);border:1px solid var(--border);border-radius:var(--r-sm);padding:12px;font-family:var(--mono);font-size:12px;color:var(--text);resize:vertical;min-height:80px;outline:none;transition:border .15s;line-height:1.6;}
 textarea:focus{border-color:var(--accent);}
 textarea::placeholder{color:var(--text3);}
+/* TEMPLATE */
+.template-box{margin:0 24px 24px;background:var(--accent-light);border:1px solid var(--accent);border-radius:var(--r-sm);padding:14px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;}
+.template-txt{font-size:13px;color:var(--accent);}
+.template-txt strong{font-weight:600;}
 /* TABLE */
 .tscroll{overflow-x:auto;}
 table{width:100%;border-collapse:collapse;font-size:12px;}
@@ -80,10 +81,14 @@ select:focus{border-color:var(--accent);}
 .ccl{background:#EEF0FB;color:#3547B8;}
 .cp{background:#F5EEFB;color:#7325B8;}
 .cq{background:#EEF5FB;color:#1871B8;}
-/* MAP SUMMARY */
-.mapsumm{margin:0 24px 20px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;}
+.mapsumm{margin:0 24px 0;background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;}
 .mapsumm h4{font-size:11px;font-weight:600;color:var(--text2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:10px;}
 .maptags{display:flex;gap:8px;flex-wrap:wrap;}
+/* SAVE BANNER */
+.save-banner{margin:12px 24px 20px;background:var(--accent);border-radius:var(--r-sm);padding:12px 16px;display:flex;align-items:center;justify-content:space-between;gap:12px;}
+.save-banner span{font-size:13px;color:#fff;}
+.save-banner.saved{background:#E8F0EC;border:1px solid var(--accent);}
+.save-banner.saved span{color:var(--accent);}
 /* DASHBOARD */
 .dbanner{background:var(--yellow-light);border:1px solid #d4b030;border-radius:var(--r-sm);padding:9px 16px;font-size:12px;color:#7A6318;margin-bottom:20px;}
 .kgrid{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px;}
@@ -112,29 +117,31 @@ select:focus{border-color:var(--accent);}
 .mgl{background:var(--accent2-light);color:var(--accent2);}
 .ibox{background:var(--yellow-light);border:1px solid #d4b030;border-radius:var(--r-sm);padding:12px 16px;margin-top:16px;font-size:13px;color:#5A4A10;line-height:1.6;}
 .ibox strong{font-weight:600;}
-/* SVG CHART */
-.chart-svg{width:100%;overflow:visible;}
-/* CTA */
 .ctabar{background:var(--surface);border:1px solid var(--border);border-radius:var(--r);padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:12px;margin-top:4px;}
-.btn{padding:9px 18px;background:var(--accent);border:none;border-radius:var(--r-sm);font-family:var(--font);font-size:13px;font-weight:500;color:#fff;cursor:pointer;transition:all .15s;}
+/* BUTTONS */
+.btn{display:inline-flex;align-items:center;gap:6px;padding:9px 18px;background:var(--accent);border:none;border-radius:var(--r-sm);font-family:var(--font);font-size:13px;font-weight:500;color:#fff;cursor:pointer;transition:all .15s;}
 .btn:hover{background:#22493A;}
 .btn:disabled{opacity:.4;cursor:not-allowed;}
 .btn2{padding:8px 14px;background:transparent;border:1px solid var(--border2);border-radius:var(--r-sm);font-family:var(--font);font-size:13px;color:var(--text2);cursor:pointer;transition:all .15s;}
 .btn2:hover{border-color:var(--text2);color:var(--text);}
 .btng{background:none;border:none;font-size:12px;color:var(--text3);cursor:pointer;text-decoration:underline;font-family:var(--font);}
+.btng:hover{color:var(--accent2);}
 .note{background:var(--accent-light);border:1px solid var(--accent);border-radius:var(--r-sm);padding:10px 16px;margin:16px 24px 0;font-size:13px;color:var(--accent);font-weight:500;}
+.chart-svg{display:block;width:100%;overflow:visible;}
 @media(max-width:640px){
   .kgrid{grid-template-columns:1fr 1fr;}
   .cgrid{grid-template-columns:1fr;}
   .cfull{grid-column:1;}
   .main{padding:16px 12px 48px;}
+  .header{padding:0 12px;}
+  .ns span{display:none;}
 }
 </style>
 </head>
 <body>
 <div id="app"></div>
 <script>
-// ── DATA ─────────────────────────────────────────────────────────────────────
+// ── CONSTANTS ─────────────────────────────────────────────────────────────────
 const TOTAL = 12000000;
 const CLIENTES = [
   {nombre:'ElectroMax SA',       pct:.30,margen:.20,categoria:'Celulares'},
@@ -160,390 +167,444 @@ const DATA_T=[
 ];
 
 const CATS=[
-  {v:'',      l:'— Sin categoría —'},
-  {v:'fecha', l:'📅 Fecha',    b:'cf'},
-  {v:'ventas',l:'💰 Ventas',   b:'cv'},
-  {v:'costos',l:'📦 Costos',   b:'cc'},
-  {v:'cliente',l:'👤 Cliente', b:'ccl'},
-  {v:'producto',l:'🏷️ Producto',b:'cp'},
-  {v:'cantidad',l:'🔢 Cantidad',b:'cq'},
+  {v:'',        l:'— Sin categoría —', b:''},
+  {v:'fecha',   l:'📅 Fecha',          b:'cf'},
+  {v:'ventas',  l:'💰 Ventas',         b:'cv'},
+  {v:'costos',  l:'📦 Costos',         b:'cc'},
+  {v:'cliente', l:'👤 Cliente',        b:'ccl'},
+  {v:'producto',l:'🏷️ Producto',       b:'cp'},
+  {v:'cantidad',l:'🔢 Cantidad',       b:'cq'},
 ];
 
-const DEMO=`Mes\tCliente\tCategoria\tVentas\tCostos\nEne\tElectroMax SA\tCelulares\t300000\t240000\nFeb\tHogarPlus SRL\tLinea blanca\t150000\t105000\nMar\tDistribuidora Norte\tVarios\t84000\t54600\nAbr\tAlmacen Central\tVarios\t84000\t54600\nMay\tKiosco del Centro\tVarios\t72000\t46800\nJun\tFerreteria Roca\tVarios\t72000\t46800\nJul\tSuper La Esquina\tVarios\t72000\t46800\nAgo\tMiniMarket 24hs\tVarios\t60000\t39000\nSep\tEl Buen Precio\tVarios\t60000\t39000\nOct\tResto clientes\tVarios\t108000\t70200`;
+const DEMO_CSV = 'Mes\tCliente\tCategoria\tVentas\tCostos\nEne\tElectroMax SA\tCelulares\t300000\t240000\nFeb\tHogarPlus SRL\tLinea blanca\t150000\t105000\nMar\tDistribuidora Norte\tVarios\t84000\t54600\nAbr\tAlmacen Central\tVarios\t84000\t54600\nMay\tKiosco del Centro\tVarios\t72000\t46800';
 
-// ── UTILS ────────────────────────────────────────────────────────────────────
-const fmtK=n=>n>=1000000?`$${(n/1e6).toFixed(1)}M`:`$${(n/1000).toFixed(0)}K`;
-
-function guessCategory(col){
-  const n=col.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
-  if(/fecha|date|mes|periodo/.test(n))return'fecha';
-  if(/venta|ingreso|precio|importe|total|factura/.test(n))return'ventas';
-  if(/costo|gasto|cmp/.test(n))return'costos';
-  if(/cliente|razon|empresa|nombre/.test(n))return'cliente';
-  if(/producto|articulo|item|categoria/.test(n))return'producto';
-  if(/cantidad|qty|unidad/.test(n))return'cantidad';
-  return'';
-}
-
-function parseCSV(text){
-  const lines=text.trim().split('\n').filter(l=>l.trim());
-  if(lines.length<2)return null;
-  const sep=lines[0].includes('\t')?'\t':lines[0].includes(';')?';':',';
-  const headers=lines[0].split(sep).map(h=>h.trim().replace(/^["']|["']$/g,''));
-  const rows=lines.slice(1).map(l=>{
-    const vals=l.split(sep).map(v=>v.trim().replace(/^["']|["']$/g,''));
-    const row={};headers.forEach((h,i)=>row[h]=vals[i]||'');return row;
-  });
-  return{headers,rows};
-}
-
-// ── SVG AREA CHART ───────────────────────────────────────────────────────────
-function AreaChart({data,w,h}){
-  const pad={t:10,r:10,b:28,l:52};
-  const cw=w-pad.l-pad.r, ch=h-pad.t-pad.b;
-  const maxV=Math.max(...data.map(d=>d.ventas))*1.1;
-  const xs=data.map((_,i)=>pad.l+i/(data.length-1)*cw);
-  const yv=d=>pad.t+ch-(d.ventas/maxV)*ch;
-  const yc=d=>pad.t+ch-(d.costos/maxV)*ch;
-
-  const pathV=`M${xs.map((x,i)=>`${x},${yv(data[i])}`).join('L')}`;
-  const pathC=`M${xs.map((x,i)=>`${x},${yc(data[i])}`).join('L')}`;
-  const fillV=`${pathV}L${xs[xs.length-1]},${pad.t+ch}L${xs[0]},${pad.t+ch}Z`;
-  const fillC=`${pathC}L${xs[xs.length-1]},${pad.t+ch}L${xs[0]},${pad.t+ch}Z`;
-
-  // y axis ticks
-  const yticks=[0,.25,.5,.75,1].map(p=>({y:pad.t+ch-p*ch,val:fmtK(maxV*p)}));
-  // tooltip state
-  const [tip,setTip]=window._useState(null);
-
-  return `<svg viewBox="0 0 ${w} ${h}" class="chart-svg" style="height:${h}px"
-    onmouseleave="window._setTip(null)">
-    <defs>
-      <linearGradient id="gv" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="5%" stop-color="#2A5C45" stop-opacity="0.15"/>
-        <stop offset="95%" stop-color="#2A5C45" stop-opacity="0.02"/>
-      </linearGradient>
-      <linearGradient id="gc" x1="0" y1="0" x2="0" y2="1">
-        <stop offset="5%" stop-color="#C4531A" stop-opacity="0.12"/>
-        <stop offset="95%" stop-color="#C4531A" stop-opacity="0.02"/>
-      </linearGradient>
-    </defs>
-    ${yticks.map(t=>`
-      <line x1="${pad.l}" y1="${t.y}" x2="${pad.l+cw}" y2="${t.y}" stroke="#E2DDD6" stroke-dasharray="3 3"/>
-      <text x="${pad.l-6}" y="${t.y}" text-anchor="end" dominant-baseline="central" fill="#9E9892" font-size="10" font-family="DM Mono,monospace">${t.val}</text>
-    `).join('')}
-    ${data.map((d,i)=>`<text x="${xs[i]}" y="${pad.t+ch+16}" text-anchor="middle" fill="#9E9892" font-size="10" font-family="DM Sans,sans-serif">${d.mes}</text>`).join('')}
-    <path d="${fillV}" fill="url(#gv)"/>
-    <path d="${fillC}" fill="url(#gc)"/>
-    <path d="${pathV}" fill="none" stroke="#2A5C45" stroke-width="2" stroke-linejoin="round"/>
-    <path d="${pathC}" fill="none" stroke="#C4531A" stroke-width="2" stroke-linejoin="round"/>
-    ${xs.map((x,i)=>`<rect x="${x-14}" y="${pad.t}" width="28" height="${ch}" fill="transparent"
-      onmouseenter="window._setTip({x:${x},y:${Math.min(yv(data[i]),yc(data[i]))-10},d:${JSON.stringify(data[i])}})"
-    />`).join('')}
-    ${tip?`<line x1="${tip.x}" y1="${pad.t}" x2="${tip.x}" y2="${pad.t+ch}" stroke="#CBC4BB" stroke-width="1"/>
-      <rect x="${Math.min(tip.x+6,w-130)}" y="${Math.max(tip.y-10,pad.t)}" width="120" height="70" rx="6" fill="#FDFCFA" stroke="#E2DDD6"/>
-      <text x="${Math.min(tip.x+14,w-122)}" y="${Math.max(tip.y+6,pad.t+8)}" font-size="11" font-weight="600" fill="#1A1714" font-family="DM Sans,sans-serif">${tip.d.mes}</text>
-      <text x="${Math.min(tip.x+14,w-122)}" y="${Math.max(tip.y+22,pad.t+24)}" font-size="11" fill="#2A5C45" font-family="DM Sans,sans-serif">Ventas: ${fmtK(tip.d.ventas)}</text>
-      <text x="${Math.min(tip.x+14,w-122)}" y="${Math.max(tip.y+37,pad.t+39)}" font-size="11" fill="#C4531A" font-family="DM Sans,sans-serif">Costos: ${fmtK(tip.d.costos)}</text>
-      <text x="${Math.min(tip.x+14,w-122)}" y="${Math.max(tip.y+52,pad.t+54)}" font-size="11" fill="#2A5C45" font-weight="600" font-family="DM Sans,sans-serif">Margen: ${Math.round((1-tip.d.costos/tip.d.ventas)*100)}%</text>
-    `:''}
-  </svg>`;
-}
-
-// ── BAR CHART ─────────────────────────────────────────────────────────────────
-function BarChart({data,w,h}){
-  const pad={t:10,r:10,b:28,l:52};
-  const cw=w-pad.l-pad.r, ch=h-pad.t-pad.b;
-  const maxV=Math.max(...data.map(d=>d.ventas))*1.1;
-  const bw=Math.floor(cw/data.length);
-  const gap=6;
-  const bwi=Math.floor((bw-gap*3)/2);
-
-  const yticks=[0,.25,.5,.75,1].map(p=>({y:pad.t+ch-p*ch,val:fmtK(maxV*p)}));
-
-  return `<svg viewBox="0 0 ${w} ${h}" class="chart-svg" style="height:${h}px">
-    ${yticks.map(t=>`
-      <line x1="${pad.l}" y1="${t.y}" x2="${pad.l+cw}" y2="${t.y}" stroke="#E2DDD6" stroke-dasharray="3 3"/>
-      <text x="${pad.l-6}" y="${t.y}" text-anchor="end" dominant-baseline="central" fill="#9E9892" font-size="10" font-family="DM Mono,monospace">${t.val}</text>
-    `).join('')}
-    ${data.map((d,i)=>{
-      const x=pad.l+i*bw+gap;
-      const hv=Math.round((d.ventas/maxV)*ch);
-      const hg=Math.round((d.ganancia/maxV)*ch);
-      const ybase=pad.t+ch;
-      const lbl=d.seg.length>14?d.seg.substring(0,13)+'…':d.seg;
-      return `
-        <rect x="${x}" y="${ybase-hv}" width="${bwi}" height="${hv}" fill="#E8F0EC" rx="3"/>
-        <rect x="${x+bwi+gap}" y="${ybase-hg}" width="${bwi}" height="${hg}" fill="#2A5C45" rx="3"/>
-        <text x="${x+bwi}" y="${ybase+16}" text-anchor="middle" fill="#9E9892" font-size="9" font-family="DM Sans,sans-serif">${lbl}</text>
-      `;
-    }).join('')}
-  </svg>`;
-}
-
-// ── STATE MACHINE ─────────────────────────────────────────────────────────────
-let _state={
-  step:1, csvData:null, fileName:'', mapping:{}, periodo:'mensual', pasteText:'', drag:false, tip:null
+// ── STATE ─────────────────────────────────────────────────────────────────────
+var S = {
+  step: 1,
+  csvData: null,
+  fileName: '',
+  mapping: {},
+  mappingSaved: false,
+  periodo: 'mensual',
+  pasteText: '',
+  tip: null
 };
-window._useState=k=>_state[k];
-window._setTip=v=>{_state.tip=v;render();};
 
-function setState(patch){_state={..._state,...patch};render();}
-
-// ── RENDER HELPERS ────────────────────────────────────────────────────────────
-function renderHeader(){
-  const steps=['Importar','Categorizar','Dashboard','Chat IA'];
-  const s=_state.step;
-  return `<div class="header">
-    <div class="logo"><div class="logo-dot"></div>gestiónPyME<span class="vbadge">v1.0</span></div>
-    <div class="nav">
-      ${steps.map((st,i)=>{
-        const cls=s===i+1?'active':s>i+1?'done':'';
-        return `${i>0?'<span class="sep">›</span>':''}
-        <div class="ns ${cls}" onclick="if(${s}>=${i+2})setState({step:${i+1}})">
-          <div class="ns-n">${s>i+1?'✓':i+1}</div><span>${st}</span>
-        </div>`;
-      }).join('')}
-    </div>
-  </div>`;
+function setState(patch) {
+  Object.assign(S, patch);
+  render();
 }
 
-function renderStep1(){
-  return `<div class="card">
-    <div class="card-hdr">
-      <div class="slabel">Paso 1 de 3</div>
-      <div class="stitle">Importá tus datos</div>
-      <div class="ssub">Subí un Excel o CSV, o pegá tu tabla desde Google Sheets</div>
-    </div>
-    <div class="dropzone${_state.drag?' drag':''}" id="dz" onclick="document.getElementById('fi').click()"
-      ondragover="event.preventDefault();setState({drag:true})"
-      ondragleave="setState({drag:false})"
-      ondrop="handleDrop(event)">
-      <input type="file" id="fi" accept=".csv,.xlsx,.xls,.txt" onchange="handleFile(event)">
-      <div class="dicon">📂</div>
-      <div class="dtitle">Arrastrá tu archivo o hacé click para buscar</div>
-      <div class="dsub">La primera fila debe contener los nombres de columna</div>
-      <div class="ftags">
-        <span class="ftag">.xlsx</span><span class="ftag">.xls</span><span class="ftag">.csv</span><span class="ftag">.txt</span>
-      </div>
-    </div>
-    <div class="divrow"><div class="divline"></div><div class="divtxt">o pegá tu tabla</div><div class="divline"></div></div>
-    <div class="paste-wrap">
-      <div class="paste-lbl">Copiá desde Excel / Google Sheets y pegá acá:</div>
-      <textarea id="ta" placeholder="Fecha&#9;Cliente&#9;Ventas&#9;Costos&#10;Ene&#9;ElectroMax SA&#9;300000&#9;240000&#10;..." oninput="setState({pasteText:this.value})">${_state.pasteText}</textarea>
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:12px">
-        <button class="btng" onclick="document.getElementById('ta').value=DEMO;setState({pasteText:DEMO})">Cargar datos de ejemplo →</button>
-        <button class="btn" onclick="processPaste()" ${!_state.pasteText.trim()?'disabled':''}>Procesar →</button>
-      </div>
-    </div>
-  </div>`;
+// ── UTILS ─────────────────────────────────────────────────────────────────────
+function fmtK(n) {
+  return n >= 1000000 ? '$' + (n/1e6).toFixed(1) + 'M' : '$' + (n/1000).toFixed(0) + 'K';
 }
 
-function renderStep2(){
-  const {csvData,fileName,mapping}=_state;
-  const mapped=Object.values(mapping).filter(v=>v).length;
-  return `<div class="card">
-    <div class="card-hdr">
-      <div class="slabel">Paso 2 de 3</div>
-      <div class="stitle">Categorizá tus columnas</div>
-      <div class="ssub"><strong>${fileName}</strong> — ${csvData.rows.length} filas, ${csvData.headers.length} columnas.
-        <button class="btng" onclick="setState({step:1})">Cambiar archivo</button>
-      </div>
-    </div>
-    <div class="note">✓ Datos cargados — revisá la vista previa y categorizá cada columna</div>
-    <div style="padding:16px 24px">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">
-        <span style="font-size:13px;font-weight:600">Vista previa</span>
-        <span style="font-size:12px;color:var(--text3);font-family:var(--mono)">${Math.min(4,csvData.rows.length)} de ${csvData.rows.length} filas</span>
-      </div>
-      <div class="tscroll" style="border:1px solid var(--border);border-radius:6px">
-        <table>
-          <thead><tr>${csvData.headers.map(h=>`<th>${h}</th>`).join('')}</tr></thead>
-          <tbody>${csvData.rows.slice(0,4).map(r=>`<tr>${csvData.headers.map(h=>`<td>${r[h]??''}</td>`).join('')}</tr>`).join('')}</tbody>
-        </table>
-        ${csvData.rows.length>4?`<div style="text-align:center;padding:6px;font-size:11px;color:var(--text3);background:var(--bg);border-top:1px solid var(--border)">+${csvData.rows.length-4} filas más</div>`:''}
-      </div>
-    </div>
-    <div style="padding:0 24px;border-top:1px solid var(--border);padding-top:16px">
-      <div class="slabel" style="margin-bottom:4px">Capa semántica</div>
-      <div style="font-size:13px;color:var(--text2);margin-bottom:4px">¿Qué representa cada columna? Detectamos ${mapped} de ${csvData.headers.length} automáticamente.</div>
-    </div>
-    <div class="col-grid">
-      ${csvData.headers.map(col=>{
-        const val=mapping[col]||'';
-        const cat=CATS.find(c=>c.v===val);
-        const sample=csvData.rows.slice(0,3).map(r=>r[col]).filter(Boolean).join(', ');
-        return `<div class="col-card${val?' mapped':''}">
-          <div class="col-name" title="${col}">${col}</div>
-          <div class="col-sample">ej: ${sample||'—'}</div>
-          <select onchange="setMapping('${col}',this.value)">
-            ${CATS.map(c=>`<option value="${c.v}"${val===c.v?' selected':''}>${c.l}</option>`).join('')}
-          </select>
-          ${val?`<div class="cbadge ${cat?cat.b:''}">${cat?cat.l:''}</div>`:''}
-        </div>`;
-      }).join('')}
-    </div>
-    <div class="mapsumm">
-      <h4>Resumen del mapeo</h4>
-      <div class="maptags">
-        ${CATS.slice(1).map(cat=>{
-          const cols=csvData.headers.filter(h=>mapping[h]===cat.v);
-          if(!cols.length)return'';
-          return `<span class="cbadge ${cat.b}" style="padding:4px 10px;font-size:12px">${cat.l}: ${cols.join(', ')}</span>`;
-        }).join('')}
-        ${mapped===0?`<span style="font-size:13px;color:var(--text3)">Sin columnas categorizadas todavía</span>`:''}
-      </div>
-    </div>
-    <div class="ctabar">
-      <div style="font-size:12px;color:var(--text2)">${mapped<2?'Categorizá al menos 2 columnas para continuar':`✓ ${mapped} columnas categorizadas — listo`}</div>
-      <div style="display:flex;gap:8px">
-        <button class="btn2" onclick="setState({step:1})">← Volver</button>
-        <button class="btn" ${mapped<2?'disabled':''} onclick="setState({step:3})">Ver Dashboard →</button>
-      </div>
-    </div>
-  </div>`;
+function guessCategory(col) {
+  var n = col.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+  if (/fecha|date|mes|periodo/.test(n)) return 'fecha';
+  if (/venta|ingreso|precio|importe|total|factura/.test(n)) return 'ventas';
+  if (/costo|gasto|cmp/.test(n)) return 'costos';
+  if (/cliente|razon|empresa|nombre/.test(n)) return 'cliente';
+  if (/producto|articulo|item|categoria/.test(n)) return 'producto';
+  if (/cantidad|qty|unidad/.test(n)) return 'cantidad';
+  return '';
 }
 
-function renderStep3(){
-  const data=_state.periodo==='mensual'?DATA_M:DATA_T;
-  const totV=CLIENTES.reduce((s,c)=>s+c.ventas,0);
-  const totG=CLIENTES.reduce((s,c)=>s+c.ganancia,0);
-  const mg=Math.round(totG/totV*100);
-  const maxV=CLIENTES[0].ventas;
-  const seg1G=CLIENTES[0].ganancia;
-  const seg3V=CLIENTES.slice(2).reduce((s,c)=>s+c.ventas,0);
-  const seg3G=CLIENTES.slice(2).reduce((s,c)=>s+c.ganancia,0);
-  const getMgC=p=>p>=35?'mgh':p>=28?'mgm':'mgl';
-  const W=Math.min(880,window.innerWidth-80);
+function parseCSV(text) {
+  var lines = text.trim().split('\n').filter(function(l){ return l.trim(); });
+  if (lines.length < 2) return null;
+  var sep = lines[0].indexOf('\t') >= 0 ? '\t' : lines[0].indexOf(';') >= 0 ? ';' : ',';
+  var headers = lines[0].split(sep).map(function(h){ return h.trim().replace(/^["']|["']$/g,''); });
+  var rows = lines.slice(1).map(function(l) {
+    var vals = l.split(sep).map(function(v){ return v.trim().replace(/^["']|["']$/g,''); });
+    var row = {};
+    headers.forEach(function(h,i){ row[h] = vals[i] || ''; });
+    return row;
+  });
+  return { headers: headers, rows: rows };
+}
 
-  const segData=[
-    {seg:'ElectroMax (30%)',ventas:CLIENTES[0].ventas,ganancia:seg1G,mg:20},
-    {seg:'HogarPlus (15%)', ventas:CLIENTES[1].ventas,ganancia:CLIENTES[1].ganancia,mg:30},
-    {seg:'Resto (55%)',     ventas:seg3V,ganancia:seg3G,mg:35},
+function mappedCount() {
+  return Object.values(S.mapping).filter(function(v){ return v && v !== ''; }).length;
+}
+
+function getMgClass(p) {
+  return p >= 35 ? 'mgh' : p >= 28 ? 'mgm' : 'mgl';
+}
+
+// ── TEMPLATE DOWNLOAD ─────────────────────────────────────────────────────────
+function downloadTemplate() {
+  var wb = XLSX.utils.book_new();
+  // Sheet 1: template vacío
+  var wsEmpty = XLSX.utils.aoa_to_sheet([
+    ['Fecha','Cliente','Producto','Categoria','Ventas','Costos','Cantidad']
+  ]);
+  wsEmpty['!cols'] = [{wch:12},{wch:24},{wch:20},{wch:16},{wch:12},{wch:12},{wch:10}];
+  XLSX.utils.book_append_sheet(wb, wsEmpty, 'Datos');
+  // Sheet 2: ejemplo con 5 filas
+  var wsEjemplo = XLSX.utils.aoa_to_sheet([
+    ['Fecha','Cliente','Producto','Categoria','Ventas','Costos','Cantidad'],
+    ['Ene-2024','ElectroMax SA','iPhone 15','Celulares',350000,280000,5],
+    ['Ene-2024','HogarPlus SRL','Heladera Kohinoor','Línea blanca',180000,126000,3],
+    ['Feb-2024','Kiosco del Centro','Coca Cola 2L','Bebidas',45000,29000,150],
+    ['Feb-2024','Distribuidora Norte','Detergente 1L','Limpieza',32000,20000,80],
+    ['Mar-2024','AlmacénCentral','Arroz 1kg','Alimentos',28000,18000,200],
+  ]);
+  wsEjemplo['!cols'] = [{wch:12},{wch:24},{wch:22},{wch:16},{wch:12},{wch:12},{wch:10}];
+  XLSX.utils.book_append_sheet(wb, wsEjemplo, 'Ejemplo');
+  XLSX.writeFile(wb, 'template_gestionpyme.xlsx');
+}
+
+// ── SVG CHARTS ────────────────────────────────────────────────────────────────
+function renderAreaChart(data, w, h) {
+  var pad = {t:10, r:10, b:28, l:56};
+  var cw = w - pad.l - pad.r;
+  var ch = h - pad.t - pad.b;
+  var maxV = Math.max.apply(null, data.map(function(d){ return d.ventas; })) * 1.1;
+  var xs = data.map(function(_,i){ return pad.l + i/(data.length-1)*cw; });
+  function yv(d){ return pad.t + ch - (d.ventas/maxV)*ch; }
+  function yc(d){ return pad.t + ch - (d.costos/maxV)*ch; }
+
+  var pathV = 'M' + xs.map(function(x,i){ return x.toFixed(1)+','+yv(data[i]).toFixed(1); }).join('L');
+  var pathC = 'M' + xs.map(function(x,i){ return x.toFixed(1)+','+yc(data[i]).toFixed(1); }).join('L');
+  var fillV = pathV + 'L'+(xs[xs.length-1].toFixed(1))+','+(pad.t+ch)+'L'+(xs[0].toFixed(1))+','+(pad.t+ch)+'Z';
+  var fillC = pathC + 'L'+(xs[xs.length-1].toFixed(1))+','+(pad.t+ch)+'L'+(xs[0].toFixed(1))+','+(pad.t+ch)+'Z';
+
+  var yticks = [0,.25,.5,.75,1].map(function(p){
+    return {y:(pad.t+ch-p*ch).toFixed(1), val:fmtK(maxV*p)};
+  });
+
+  var tipHtml = '';
+  if (S.tip) {
+    var tx = Math.min(S.tip.x + 8, w - 128);
+    var ty = Math.max(S.tip.y - 10, pad.t);
+    tipHtml = '<line x1="'+S.tip.x+'" y1="'+pad.t+'" x2="'+S.tip.x+'" y2="'+(pad.t+ch)+'" stroke="#CBC4BB" stroke-width="1"/>'
+      + '<rect x="'+tx+'" y="'+ty+'" width="120" height="72" rx="6" fill="#FDFCFA" stroke="#E2DDD6" stroke-width="1"/>'
+      + '<text x="'+(tx+8)+'" y="'+(ty+16)+'" font-size="11" font-weight="600" fill="#1A1714" font-family="DM Sans,sans-serif">'+S.tip.d.mes+'</text>'
+      + '<text x="'+(tx+8)+'" y="'+(ty+32)+'" font-size="11" fill="#2A5C45" font-family="DM Sans,sans-serif">Ventas: '+fmtK(S.tip.d.ventas)+'</text>'
+      + '<text x="'+(tx+8)+'" y="'+(ty+47)+'" font-size="11" fill="#C4531A" font-family="DM Sans,sans-serif">Costos: '+fmtK(S.tip.d.costos)+'</text>'
+      + '<text x="'+(tx+8)+'" y="'+(ty+62)+'" font-size="11" fill="#2A5C45" font-weight="600" font-family="DM Sans,sans-serif">Margen: '+Math.round((1-S.tip.d.costos/S.tip.d.ventas)*100)+'%</text>';
+  }
+
+  return '<svg viewBox="0 0 '+w+' '+h+'" class="chart-svg" style="height:'+h+'px" onmouseleave="clearTip()">'
+    + '<defs>'
+    + '<linearGradient id="gv" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stop-color="#2A5C45" stop-opacity="0.15"/><stop offset="95%" stop-color="#2A5C45" stop-opacity="0.02"/></linearGradient>'
+    + '<linearGradient id="gc" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stop-color="#C4531A" stop-opacity="0.12"/><stop offset="95%" stop-color="#C4531A" stop-opacity="0.02"/></linearGradient>'
+    + '</defs>'
+    + yticks.map(function(t){
+        return '<line x1="'+pad.l+'" y1="'+t.y+'" x2="'+(pad.l+cw)+'" y2="'+t.y+'" stroke="#E2DDD6" stroke-dasharray="3 3"/>'
+          + '<text x="'+(pad.l-6)+'" y="'+t.y+'" text-anchor="end" dominant-baseline="central" fill="#9E9892" font-size="10" font-family="DM Mono,monospace">'+t.val+'</text>';
+      }).join('')
+    + data.map(function(d,i){
+        return '<text x="'+xs[i].toFixed(1)+'" y="'+(pad.t+ch+16)+'" text-anchor="middle" fill="#9E9892" font-size="10" font-family="DM Sans,sans-serif">'+d.mes+'</text>';
+      }).join('')
+    + '<path d="'+fillV+'" fill="url(#gv)"/>'
+    + '<path d="'+fillC+'" fill="url(#gc)"/>'
+    + '<path d="'+pathV+'" fill="none" stroke="#2A5C45" stroke-width="2" stroke-linejoin="round"/>'
+    + '<path d="'+pathC+'" fill="none" stroke="#C4531A" stroke-width="2" stroke-linejoin="round"/>'
+    + xs.map(function(x,i){
+        var d = data[i];
+        var ty2 = Math.min(yv(d), yc(d));
+        return '<rect x="'+(x-14).toFixed(1)+'" y="'+pad.t+'" width="28" height="'+ch+'" fill="transparent"'
+          + ' onmouseenter="showTip('+x.toFixed(1)+','+ty2.toFixed(1)+','+JSON.stringify(d)+')"/>';
+      }).join('')
+    + tipHtml
+    + '</svg>';
+}
+
+function renderBarChart(data, w, h) {
+  var pad = {t:10, r:10, b:36, l:56};
+  var cw = w - pad.l - pad.r;
+  var ch = h - pad.t - pad.b;
+  var maxV = Math.max.apply(null, data.map(function(d){ return d.ventas; })) * 1.1;
+  var bw = Math.floor(cw / data.length);
+  var gap = 6;
+  var bwi = Math.floor((bw - gap*3) / 2);
+
+  var yticks = [0,.25,.5,.75,1].map(function(p){
+    return {y:(pad.t+ch-p*ch).toFixed(1), val:fmtK(maxV*p)};
+  });
+
+  return '<svg viewBox="0 0 '+w+' '+h+'" class="chart-svg" style="height:'+h+'px">'
+    + yticks.map(function(t){
+        return '<line x1="'+pad.l+'" y1="'+t.y+'" x2="'+(pad.l+cw)+'" y2="'+t.y+'" stroke="#E2DDD6" stroke-dasharray="3 3"/>'
+          + '<text x="'+(pad.l-6)+'" y="'+t.y+'" text-anchor="end" dominant-baseline="central" fill="#9E9892" font-size="10" font-family="DM Mono,monospace">'+t.val+'</text>';
+      }).join('')
+    + data.map(function(d,i){
+        var x = pad.l + i*bw + gap;
+        var hv = Math.round((d.ventas/maxV)*ch);
+        var hg = Math.round((d.ganancia/maxV)*ch);
+        var ybase = pad.t + ch;
+        var lbl = d.seg.length > 14 ? d.seg.substring(0,13)+'…' : d.seg;
+        return '<rect x="'+x+'" y="'+(ybase-hv)+'" width="'+bwi+'" height="'+hv+'" fill="#E8F0EC" rx="3"/>'
+          + '<rect x="'+(x+bwi+gap)+'" y="'+(ybase-hg)+'" width="'+bwi+'" height="'+hg+'" fill="#2A5C45" rx="3"/>'
+          + '<text x="'+(x+bwi).toFixed(1)+'" y="'+(ybase+16)+'" text-anchor="middle" fill="#9E9892" font-size="9" font-family="DM Sans,sans-serif">'+lbl+'</text>';
+      }).join('')
+    + '</svg>';
+}
+
+// ── RENDER SECTIONS ───────────────────────────────────────────────────────────
+function renderHeader() {
+  var steps = ['Importar','Categorizar','Dashboard','Chat IA'];
+  return '<div class="header">'
+    + '<div class="logo"><div class="logo-dot"></div>gestiónPyME<span class="vbadge">v1.0</span></div>'
+    + '<div class="nav">'
+    + steps.map(function(st,i){
+        var cls = S.step===i+1 ? 'active' : S.step>i+1 ? 'done' : '';
+        var click = S.step>i+1 ? ' onclick="goStep('+(i+1)+')"' : '';
+        return (i>0?'<span class="sep">›</span>':'')
+          + '<div class="ns '+cls+'"'+click+'>'
+          + '<div class="ns-n">'+(S.step>i+1?'✓':i+1)+'</div>'
+          + '<span>'+st+'</span></div>';
+      }).join('')
+    + '</div></div>';
+}
+
+function renderStep1() {
+  return '<div class="card">'
+    + '<div class="card-hdr">'
+    + '<div class="slabel">Paso 1 de 3</div>'
+    + '<div class="stitle">Importá tus datos</div>'
+    + '<div class="ssub">Subí un Excel o CSV, o pegá tu tabla desde Google Sheets</div>'
+    + '</div>'
+    + '<div class="template-box">'
+    + '<div class="template-txt">📥 <strong>¿Primera vez?</strong> Descargá el template, completalo y volvé a subirlo. Incluye una pestaña de ejemplo.</div>'
+    + '<button class="btn" onclick="downloadTemplate()" style="white-space:nowrap;flex-shrink:0">Descargar template</button>'
+    + '</div>'
+    + '<div class="dropzone" id="dz" ondragover="event.preventDefault();document.getElementById(\'dz\').classList.add(\'drag\')" ondragleave="document.getElementById(\'dz\').classList.remove(\'drag\')" ondrop="handleDrop(event)">'
+    + '<input type="file" id="fi" accept=".csv,.xlsx,.xls,.txt" onchange="handleFileInput(event)">'
+    + '<div class="dicon">📂</div>'
+    + '<div class="dtitle">Arrastrá tu archivo o hacé click para buscar</div>'
+    + '<div class="dsub">La primera fila debe contener los nombres de columna</div>'
+    + '<div class="ftags"><span class="ftag">.xlsx</span><span class="ftag">.xls</span><span class="ftag">.csv</span><span class="ftag">.txt</span></div>'
+    + '</div>'
+    + '<div class="divrow"><div class="divline"></div><div class="divtxt">o pegá tu tabla</div><div class="divline"></div></div>'
+    + '<div class="paste-wrap">'
+    + '<div class="paste-lbl">Copiá desde Excel / Google Sheets y pegá acá:</div>'
+    + '<textarea id="ta" placeholder="Fecha&#9;Cliente&#9;Ventas&#9;Costos&#10;Ene&#9;ElectroMax SA&#9;300000&#9;240000&#10;..." oninput="S.pasteText=this.value">'+S.pasteText+'</textarea>'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-top:8px;gap:12px">'
+    + '<button class="btng" onclick="loadDemo()">Cargar datos de ejemplo →</button>'
+    + '<button class="btn" onclick="processPaste()"'+(S.pasteText.trim()?'':' disabled')+'>Procesar →</button>'
+    + '</div></div></div>';
+}
+
+function renderStep2() {
+  var mc = mappedCount();
+  var canProceed = mc >= 2;
+  return '<div class="card">'
+    + '<div class="card-hdr">'
+    + '<div class="slabel">Paso 2 de 3</div>'
+    + '<div class="stitle">Categorizá tus columnas</div>'
+    + '<div class="ssub"><strong>'+S.fileName+'</strong> — '+S.csvData.rows.length+' filas, '+S.csvData.headers.length+' columnas. <button class="btng" onclick="goStep(1)">Cambiar archivo</button></div>'
+    + '</div>'
+    + '<div class="note">✓ Datos cargados — revisá la vista previa y categorizá cada columna</div>'
+    + '<div style="padding:16px 24px">'
+    + '<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px">'
+    + '<span style="font-size:13px;font-weight:600">Vista previa</span>'
+    + '<span style="font-size:12px;color:var(--text3);font-family:var(--mono)">'+Math.min(4,S.csvData.rows.length)+' de '+S.csvData.rows.length+' filas</span>'
+    + '</div>'
+    + '<div class="tscroll" style="border:1px solid var(--border);border-radius:6px">'
+    + '<table><thead><tr>'+S.csvData.headers.map(function(h){ return '<th>'+h+'</th>'; }).join('')+'</tr></thead>'
+    + '<tbody>'+S.csvData.rows.slice(0,4).map(function(r){
+        return '<tr>'+S.csvData.headers.map(function(h){ return '<td>'+(r[h]||'')+'</td>'; }).join('')+'</tr>';
+      }).join('')+'</tbody></table>'
+    + (S.csvData.rows.length>4?'<div style="text-align:center;padding:6px;font-size:11px;color:var(--text3);background:var(--bg);border-top:1px solid var(--border)">+'+(S.csvData.rows.length-4)+' filas más</div>':'')
+    + '</div></div>'
+    + '<div style="padding:0 24px;border-top:1px solid var(--border);padding-top:16px">'
+    + '<div class="slabel" style="margin-bottom:4px">Capa semántica</div>'
+    + '<div style="font-size:13px;color:var(--text2);margin-bottom:4px">¿Qué representa cada columna? Detectamos '+mc+' de '+S.csvData.headers.length+' automáticamente.</div>'
+    + '</div>'
+    + '<div class="col-grid">'
+    + S.csvData.headers.map(function(col){
+        var val = S.mapping[col] || '';
+        var cat = CATS.find(function(c){ return c.v === val; });
+        var sample = S.csvData.rows.slice(0,3).map(function(r){ return r[col]; }).filter(Boolean).join(', ');
+        return '<div class="col-card'+(val?' mapped':'')+'">'
+          + '<div class="col-name" title="'+col+'">'+col+'</div>'
+          + '<div class="col-sample">ej: '+(sample||'—')+'</div>'
+          + '<select onchange="setMap(\''+col+'\',this.value)">'
+          + CATS.map(function(c){ return '<option value="'+c.v+'"'+(val===c.v?' selected':'')+'>'+c.l+'</option>'; }).join('')
+          + '</select>'
+          + (val&&cat?'<div class="cbadge '+cat.b+'">'+cat.l+'</div>':'')
+          + '</div>';
+      }).join('')
+    + '</div>'
+    + '<div class="mapsumm">'
+    + '<h4>Resumen del mapeo</h4>'
+    + '<div class="maptags">'
+    + CATS.slice(1).map(function(cat){
+        var cols = S.csvData.headers.filter(function(h){ return S.mapping[h]===cat.v; });
+        if (!cols.length) return '';
+        return '<span class="cbadge '+cat.b+'" style="padding:4px 10px;font-size:12px">'+cat.l+': '+cols.join(', ')+'</span>';
+      }).join('')
+    + (mc===0?'<span style="font-size:13px;color:var(--text3)">Sin columnas categorizadas todavía</span>':'')
+    + '</div></div>'
+    + '<div class="'+(S.mappingSaved?'save-banner saved':'save-banner')+'">'
+    + '<span>'+(S.mappingSaved?'✓ Segmentación guardada — podés continuar al dashboard':'Guardá la segmentación antes de continuar')+'</span>'
+    + '<div style="display:flex;gap:8px">'
+    + (S.mappingSaved
+        ? '<button class="btn2" onclick="goStep(1)" style="background:#fff">← Volver</button><button class="btn" onclick="goStep(3)">Ver Dashboard →</button>'
+        : '<button class="btn2" onclick="goStep(1)" style="border-color:rgba(255,255,255,.4);color:#fff">← Volver</button><button class="btn" onclick="saveMapping()" style="background:#fff;color:var(--accent)"'+(canProceed?'':' disabled')+'>💾 Guardar segmentación</button>'
+      )
+    + '</div></div>'
+    + '</div>';
+}
+
+function renderStep3() {
+  var data = S.periodo==='mensual' ? DATA_M : DATA_T;
+  var totV = CLIENTES.reduce(function(s,c){ return s+c.ventas; },0);
+  var totG = CLIENTES.reduce(function(s,c){ return s+c.ganancia; },0);
+  var mg   = Math.round(totG/totV*100);
+  var maxV = CLIENTES[0].ventas;
+  var seg1G = CLIENTES[0].ganancia;
+  var seg3V = CLIENTES.slice(2).reduce(function(s,c){ return s+c.ventas; },0);
+  var seg3G = CLIENTES.slice(2).reduce(function(s,c){ return s+c.ganancia; },0);
+  var W = Math.min(880, (document.documentElement.clientWidth||800) - 80);
+  var Whalf = Math.round(W/2) - 40;
+
+  var segData = [
+    {seg:'ElectroMax (30%)', ventas:CLIENTES[0].ventas, ganancia:seg1G,             mg:20},
+    {seg:'HogarPlus (15%)',  ventas:CLIENTES[1].ventas, ganancia:CLIENTES[1].ganancia, mg:30},
+    {seg:'Resto (55%)',      ventas:seg3V,               ganancia:seg3G,             mg:35},
   ];
 
-  return `
-    <div class="dbanner">📊 Datos de ejemplo — así se ve cuando cargás tu propio Excel</div>
-    <div class="kgrid">
-      <div class="kpi"><div class="klbl">Ventas totales</div><div class="kval">${fmtK(totV)}</div><div class="kdelta up">↑ 18% vs año anterior</div></div>
-      <div class="kpi"><div class="klbl">Ganancia bruta</div><div class="kval">${fmtK(totG)}</div><div class="kdelta up">↑ 22% vs año anterior</div></div>
-      <div class="kpi"><div class="klbl">Margen global</div><div class="kval warn">${mg}%</div><div class="kdelta warn">⚠ Arrastrado por cliente 1</div></div>
-      <div class="kpi"><div class="klbl">Clientes activos</div><div class="kval">10</div><div class="kdelta up">1 cliente = 30% del total</div></div>
-    </div>
-    <div class="ptabs">
-      <button class="ptab${_state.periodo==='mensual'?' active':''}" onclick="setState({periodo:'mensual'})">Mensual</button>
-      <button class="ptab${_state.periodo==='trimestral'?' active':''}" onclick="setState({periodo:'trimestral'})">Trimestral</button>
-    </div>
-    <div class="cgrid">
-      <div class="ccrd cfull">
-        <div class="ctitle">Ventas vs Costos</div>
-        <div class="csub">El área entre las curvas es tu margen bruto</div>
-        <div class="legrow">
-          <div class="legitem"><div class="legdot" style="background:#2A5C45"></div>Ventas</div>
-          <div class="legitem"><div class="legdot" style="background:#C4531A"></div>Costos</div>
-        </div>
-        ${AreaChart({data,w:W,h:200})}
-      </div>
-      <div class="ccrd">
-        <div class="ctitle">Top clientes por facturación</div>
-        <div class="csub">Ventas anuales y margen por cliente</div>
-        <div class="tscroll">
-          <table>
-            <thead><tr><th>#</th><th>Cliente</th><th class="r">Ventas</th><th class="r">Margen</th></tr></thead>
-            <tbody>
-              ${CLIENTES.map((c,i)=>`<tr>
-                <td><span class="rankn">#${i+1}</span></td>
-                <td>
-                  <div style="font-weight:${i<2?500:400};font-size:12px">${c.nombre}</div>
-                  <div class="barinl" style="width:${Math.round(c.ventas/maxV*100)}%;background:${i===0?'#C4531A':i===1?'#E8C84A':'#2A5C45'}"></div>
-                </td>
-                <td class="r">${fmtK(c.ventas)}</td>
-                <td class="r"><span class="mgb ${getMgC(Math.round(c.margen*100))}">${Math.round(c.margen*100)}%</span></td>
-              </tr>`).join('')}
-            </tbody>
-          </table>
-        </div>
-      </div>
-      <div class="ccrd">
-        <div class="ctitle">Ganancia por segmento</div>
-        <div class="csub">Dónde se genera realmente el margen</div>
-        <div class="legrow">
-          <div class="legitem"><div class="legdot" style="background:#E8F0EC;border:1px solid #2A5C45"></div>Ventas</div>
-          <div class="legitem"><div class="legdot" style="background:#2A5C45"></div>Ganancia</div>
-        </div>
-        ${BarChart({data:segData,w:Math.round(W/2)-40,h:180})}
-        <div class="ibox">
-          💡 <strong>Insight clave:</strong> ElectroMax es el 30% de tus ventas pero solo el <strong>${Math.round(seg1G/totG*100)}% de tu ganancia</strong>. Los clientes chicos generan el <strong>${Math.round(seg3G/totG*100)}% del margen total</strong>.
-        </div>
-      </div>
-    </div>
-    <div class="ctabar">
-      <div style="font-size:13px;color:var(--text2)">✓ Dashboard completo — Chat IA disponible próximamente</div>
-      <div style="display:flex;gap:8px">
-        <button class="btn2" onclick="setState({step:2})">← Volver</button>
-        <button class="btn" disabled>Chat IA — próximamente →</button>
-      </div>
-    </div>`;
+  return '<div class="dbanner">📊 Datos de ejemplo — así se ve cuando cargás tu propio Excel</div>'
+    + '<div class="kgrid">'
+    + '<div class="kpi"><div class="klbl">Ventas totales</div><div class="kval">'+fmtK(totV)+'</div><div class="kdelta up">↑ 18% vs año anterior</div></div>'
+    + '<div class="kpi"><div class="klbl">Ganancia bruta</div><div class="kval">'+fmtK(totG)+'</div><div class="kdelta up">↑ 22% vs año anterior</div></div>'
+    + '<div class="kpi"><div class="klbl">Margen global</div><div class="kval warn">'+mg+'%</div><div class="kdelta warn">⚠ Arrastrado por cliente 1</div></div>'
+    + '<div class="kpi"><div class="klbl">Clientes activos</div><div class="kval">10</div><div class="kdelta up">1 cliente = 30% del total</div></div>'
+    + '</div>'
+    + '<div class="ptabs">'
+    + '<button class="ptab'+(S.periodo==='mensual'?' active':'')+'" onclick="setState({periodo:\'mensual\'})">Mensual</button>'
+    + '<button class="ptab'+(S.periodo==='trimestral'?' active':'')+'" onclick="setState({periodo:\'trimestral\'})">Trimestral</button>'
+    + '</div>'
+    + '<div class="cgrid">'
+    + '<div class="ccrd cfull">'
+    + '<div class="ctitle">Ventas vs Costos</div>'
+    + '<div class="csub">El área entre las curvas es tu margen bruto</div>'
+    + '<div class="legrow"><div class="legitem"><div class="legdot" style="background:#2A5C45"></div>Ventas</div><div class="legitem"><div class="legdot" style="background:#C4531A"></div>Costos</div></div>'
+    + renderAreaChart(data, W, 200)
+    + '</div>'
+    + '<div class="ccrd">'
+    + '<div class="ctitle">Top clientes por facturación</div>'
+    + '<div class="csub">Ventas anuales y margen por cliente</div>'
+    + '<div class="tscroll"><table><thead><tr><th>#</th><th>Cliente</th><th class="r">Ventas</th><th class="r">Margen</th></tr></thead><tbody>'
+    + CLIENTES.map(function(c,i){
+        return '<tr><td><span class="rankn">#'+(i+1)+'</span></td>'
+          + '<td><div style="font-weight:'+(i<2?500:400)+';font-size:12px">'+c.nombre+'</div>'
+          + '<div class="barinl" style="width:'+Math.round(c.ventas/maxV*100)+'%;background:'+(i===0?'#C4531A':i===1?'#E8C84A':'#2A5C45')+'"></div></td>'
+          + '<td class="r">'+fmtK(c.ventas)+'</td>'
+          + '<td class="r"><span class="mgb '+getMgClass(Math.round(c.margen*100))+'">'+Math.round(c.margen*100)+'%</span></td></tr>';
+      }).join('')
+    + '</tbody></table></div></div>'
+    + '<div class="ccrd">'
+    + '<div class="ctitle">Ganancia por segmento</div>'
+    + '<div class="csub">Dónde se genera realmente el margen</div>'
+    + '<div class="legrow"><div class="legitem"><div class="legdot" style="background:#E8F0EC;border:1px solid #2A5C45"></div>Ventas</div><div class="legitem"><div class="legdot" style="background:#2A5C45"></div>Ganancia</div></div>'
+    + renderBarChart(segData, Whalf, 180)
+    + '<div class="ibox">💡 <strong>Insight clave:</strong> ElectroMax es el 30% de tus ventas pero solo el <strong>'+Math.round(seg1G/totG*100)+'% de tu ganancia</strong>. Los clientes chicos generan el <strong>'+Math.round(seg3G/totG*100)+'% del margen total</strong>.</div>'
+    + '</div></div>'
+    + '<div class="ctabar">'
+    + '<div style="font-size:13px;color:var(--text2)">✓ Dashboard completo — Chat IA disponible próximamente</div>'
+    + '<div style="display:flex;gap:8px"><button class="btn2" onclick="goStep(2)">← Volver</button><button class="btn" disabled>Chat IA — próximamente →</button></div>'
+    + '</div>';
 }
 
-// ── MAIN RENDER ───────────────────────────────────────────────────────────────
-function render(){
-  document.getElementById('app').innerHTML=`
-    ${renderHeader()}
-    <div class="main">
-      ${_state.step===1?renderStep1():''}
-      ${_state.step===2&&_state.csvData?renderStep2():''}
-      ${_state.step===3?renderStep3():''}
-    </div>`;
+// ── RENDER ────────────────────────────────────────────────────────────────────
+function render() {
+  var html = renderHeader() + '<div class="main">';
+  if (S.step===1) html += renderStep1();
+  else if (S.step===2 && S.csvData) html += renderStep2();
+  else if (S.step===3) html += renderStep3();
+  html += '</div>';
+  document.getElementById('app').innerHTML = html;
 }
 
-// ── EVENT HANDLERS ────────────────────────────────────────────────────────────
-window.setState=setState;
+// ── HANDLERS ──────────────────────────────────────────────────────────────────
+function goStep(n) {
+  setState({ step: n });
+}
 
-window.setMapping=function(col,val){
-  setState({mapping:{..._state.mapping,[col]:val}});
-};
+function setMap(col, val) {
+  S.mapping[col] = val;
+  S.mappingSaved = false;
+  render();
+}
 
-window.processPaste=function(){
-  const p=parseCSV(_state.pasteText);
-  if(p){
-    const auto={};p.headers.forEach(h=>{auto[h]=guessCategory(h);});
-    setState({csvData:p,fileName:'datos pegados',mapping:auto,step:2});
+function saveMapping() {
+  setState({ mappingSaved: true });
+}
+
+function loadDemo() {
+  var ta = document.getElementById('ta');
+  if (ta) ta.value = DEMO_CSV;
+  S.pasteText = DEMO_CSV;
+  render();
+}
+
+function processPaste() {
+  var text = S.pasteText || (document.getElementById('ta') ? document.getElementById('ta').value : '');
+  if (!text.trim()) return;
+  var p = parseCSV(text);
+  if (p) {
+    var auto = {};
+    p.headers.forEach(function(h){ auto[h] = guessCategory(h); });
+    setState({ csvData: p, fileName: 'datos pegados', mapping: auto, mappingSaved: false, step: 2 });
   } else {
-    alert('No se detectó estructura. Incluí encabezados en la primera fila.');
+    alert('No se detectó estructura. Asegurate de incluir encabezados en la primera fila.');
   }
-};
+}
 
-window.handleFile=function(e){
-  const file=e.target.files[0];if(!file)return;
-  const ext=file.name.split('.').pop().toLowerCase();
-  if(ext==='csv'||ext==='txt'){
-    const r=new FileReader();
-    r.onload=ev=>{
-      const p=parseCSV(ev.target.result);
-      if(p){const auto={};p.headers.forEach(h=>{auto[h]=guessCategory(h);});setState({csvData:p,fileName:file.name,mapping:auto,step:2});}
-    };
-    r.readAsText(file,'UTF-8');
-  } else if(ext==='xlsx'||ext==='xls'){
-    const r=new FileReader();
-    r.onload=ev=>{
-      const wb=XLSX.read(ev.target.result,{type:'array'});
-      const ws=wb.Sheets[wb.SheetNames[0]];
-      const json=XLSX.utils.sheet_to_json(ws,{defval:''});
-      if(json.length>0){
-        const auto={};Object.keys(json[0]).forEach(h=>{auto[h]=guessCategory(h);});
-        setState({csvData:{headers:Object.keys(json[0]),rows:json},fileName:file.name,mapping:auto,step:2});
+function loadFileData(file) {
+  var ext = file.name.split('.').pop().toLowerCase();
+  if (ext==='csv' || ext==='txt') {
+    var r = new FileReader();
+    r.onload = function(e) {
+      var p = parseCSV(e.target.result);
+      if (p) {
+        var auto = {};
+        p.headers.forEach(function(h){ auto[h] = guessCategory(h); });
+        setState({ csvData: p, fileName: file.name, mapping: auto, mappingSaved: false, step: 2 });
       }
     };
-    r.readAsArrayBuffer(file);
+    r.readAsText(file, 'UTF-8');
+  } else if (ext==='xlsx' || ext==='xls') {
+    var r2 = new FileReader();
+    r2.onload = function(e) {
+      var wb = XLSX.read(e.target.result, { type:'array' });
+      var ws = wb.Sheets[wb.SheetNames[0]];
+      var json = XLSX.utils.sheet_to_json(ws, { defval:'' });
+      if (json.length > 0) {
+        var headers = Object.keys(json[0]);
+        var auto = {};
+        headers.forEach(function(h){ auto[h] = guessCategory(h); });
+        setState({ csvData:{ headers:headers, rows:json }, fileName:file.name, mapping:auto, mappingSaved:false, step:2 });
+      }
+    };
+    r2.readAsArrayBuffer(file);
   }
-};
+}
 
-window.handleDrop=function(e){
-  e.preventDefault();setState({drag:false});
-  const file=e.dataTransfer.files[0];
-  if(file) window.handleFile({target:{files:[file]}});
-};
+function handleFileInput(e) {
+  if (e.target.files[0]) loadFileData(e.target.files[0]);
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+  document.getElementById('dz') && document.getElementById('dz').classList.remove('drag');
+  if (e.dataTransfer.files[0]) loadFileData(e.dataTransfer.files[0]);
+}
+
+function showTip(x, y, d) {
+  S.tip = { x:x, y:y, d:d };
+  render();
+}
+
+function clearTip() {
+  if (S.tip) { S.tip = null; render(); }
+}
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 render();
