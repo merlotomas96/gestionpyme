@@ -840,12 +840,14 @@ function renderPnL(d,W){
 function renderChartBuilder(d,W){
   var cb=S.cb;
   var allF=(S.files['ventas']||{headers:[]}).headers;
-  function fselect(val,ph,onch){
-    return'<select style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--rs);padding:5px 7px;font-size:12px;font-family:var(--font);color:var(--text);cursor:pointer;outline:none;" onchange="'+onch+'">'
-      +'<option value="">'+ph+'</option>'
-      +allF.map(function(f){return'<option value="'+f+'"'+(val===f?' selected':'')+'>'+f+'</option>';}).join('')
-      +'</select>';
-  }
+function fselect(val,ph,onch){
+  var isM=val==='__margen__';
+  return'<select style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--rs);padding:5px 7px;font-size:12px;font-family:var(--font);color:var(--text);cursor:pointer;outline:none;" onchange="'+onch+'">'
+    +'<option value="">'+ph+'</option>'
+    +'<option value="__margen__"'+(isM?' selected':'')+'>📐 Margen %</option>'
+    +allF.map(function(f){return'<option value="'+f+'"'+(val===f?' selected':'')+'>'+f+'</option>';}).join('')
+    +'</select>';
+}
   function sortSel(){
     return'<div><div class="cb-field-lbl">Ordenar eje X por</div>'
       +'<select style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--rs);padding:5px 7px;font-size:12px;font-family:var(--font);color:var(--text);cursor:pointer;outline:none;" onchange="setCB(\'sortBy\',this.value)">'
@@ -904,26 +906,27 @@ var COLORS=['#2A5C45','#C4531A','#1A5FB4','#C9950C','#6B3FA0','#0A7E6A','#A03F10
   
 function aggrData(xCol,yCol,aggr){
   var f=S.files['ventas'];if(!f||!xCol||!yCol)return[];
+  var isMargen=yCol==='__margen__';
+  var mp=S.mappings['ventas']||{};
+  var vCol=f.headers.find(function(h){return mp[h]==='ventas';});
+  var cCol=f.headers.find(function(h){return mp[h]==='costos';});
   var map={};
   f.rows.forEach(function(r){
     var dim=r[xCol]||'—';
-    var val=num(r[yCol]||0);
-    if(!map[dim])map[dim]={dim:dim,val:0,count:0};
-    map[dim].val+=val;map[dim].count++;
+    var val=isMargen?0:num(r[yCol]||0);
+    var v=isMargen?num(r[vCol]||0):0;
+    var c=isMargen?num(r[cCol]||0):0;
+    if(!map[dim])map[dim]={dim:dim,val:0,venta:0,costo:0,count:0};
+    map[dim].val+=val;map[dim].venta+=v;map[dim].costo+=c;map[dim].count++;
   });
-  var arr=Object.values(map);
-  if(aggr==='avg')arr.forEach(function(r){r.val=r.count?r.val/r.count:0;});
-  if(aggr==='count')arr.forEach(function(r){r.val=r.count;});
-  // sort
+  var arr=Object.values(map).map(function(r){
+    if(isMargen)return{dim:r.dim,val:r.venta?Math.round((1-r.costo/r.venta)*100):0,count:r.count};
+    if(aggr==='avg')return{dim:r.dim,val:r.count?r.val/r.count:0,count:r.count};
+    if(aggr==='count')return{dim:r.dim,val:r.count,count:r.count};
+    return{dim:r.dim,val:r.val,count:r.count};
+  });
   var MESES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
-  function fechaVal(s){
-    var str=String(s).toLowerCase();
-    var q=str.match(/q(\d)/);if(q)return parseInt(q[1]);
-    var my=str.match(/([a-z]+)[-\/](\d{4})/);if(my)return parseInt(my[2])*100+MESES.indexOf(my[1].substring(0,3));
-    var y=str.match(/^(\d{4})$/);if(y)return parseInt(y[1])*100;
-    var mi=MESES.indexOf(str.substring(0,3));if(mi>=0)return mi;
-    return 0;
-  }
+  function fechaVal(s){var str=String(s).toLowerCase();var q=str.match(/q(\d)/);if(q)return parseInt(q[1]);var my=str.match(/([a-z]+)[-\/](\d{4})/);if(my)return parseInt(my[2])*100+MESES.indexOf(my[1].substring(0,3));var y=str.match(/^(\d{4})$/);if(y)return parseInt(y[1])*100;var mi=MESES.indexOf(str.substring(0,3));if(mi>=0)return mi;return 0;}
   var sb=S.cb.sortBy||'val_desc';
   if(sb==='val_desc')arr.sort(function(a,b){return b.val-a.val;});
   else if(sb==='val_asc')arr.sort(function(a,b){return a.val-b.val;});
@@ -955,7 +958,7 @@ function gridH(pad,cw,ch,maxV){
   [0,.25,.5,.75,1].forEach(function(p){
     var y=(pad.t+ch-p*ch).toFixed(1);
     s+='<line x1="'+pad.l+'" y1="'+y+'" x2="'+(pad.l+cw)+'" y2="'+y+'" stroke="#E3DDD5" stroke-dasharray="3 3"/>'
-      +'<text x="'+(pad.l-5)+'" y="'+y+'" text-anchor="end" dominant-baseline="central" fill="#9E9892" font-size="10" font-family="DM Mono,monospace">'+fmtK(maxV*p)+'</text>';
+     +'<text x="'+(pad.l-5)+'" y="'+y+'" text-anchor="end" dominant-baseline="central" fill="#9E9892" font-size="10" font-family="DM Mono,monospace">'+(S.cb&&S.cb.yField==='__margen__'?Math.round(maxV*p)+'%':fmtK(maxV*p))+'</text>';
   });
   return s;
 }
@@ -983,7 +986,7 @@ function drawBar(el,cb,W,H){
       svg+='<rect x="'+pad.l+'" y="'+y0+'" width="'+h1+'" height="'+bwi+'" fill="'+COLORS[0]+'" rx="2"/>';
       if(cb.y2Field)svg+='<rect x="'+pad.l+'" y="'+(y0+bwi+gap)+'" width="'+h2+'" height="'+bwi+'" fill="'+COLORS[1]+'" rx="2"/>';
       svg+='<text x="'+(pad.l-6)+'" y="'+(y0+bwi/2)+'" text-anchor="end" dominant-baseline="central" fill="#6B6560" font-size="10" font-family="DM Sans,sans-serif">'+lbl+'</text>';
-      svg+='<text x="'+(pad.l+h1+5)+'" y="'+(y0+bwi/2)+'" dominant-baseline="central" fill="'+COLORS[0]+'" font-size="10" font-weight="600" font-family="DM Mono,monospace">'+fmtK(r.val)+'</text>';
+      (cb.yField==='__margen__'?r.val+'%':fmtK(r.val))+'" y="'+(y0+bwi/2)+'" dominant-baseline="central" fill="'+COLORS[0]+'" font-size="10" font-weight="600" font-family="DM Mono,monospace">'+fmtK(r.val)+'</text>';
     } else {
       var x0=pad.l+i*bw+gap;
       svg+='<rect x="'+x0+'" y="'+(pad.t+ch-h1)+'" width="'+bwi+'" height="'+h1+'" fill="'+COLORS[0]+'" rx="2"/>';
