@@ -503,9 +503,10 @@ function computeFromFiles(){
   var mf=S.files['manoobra'];var totMOD=0;
   if(mf&&mf.rows){mf.rows.forEach(function(r){var h=num(r['Horas_trabajadas']||r[Object.keys(r)[3]]||0);var ch=num(r['Costo_hora']||r[Object.keys(r)[4]]||0);totMOD+=h*ch;});}
 
-  var totVar=totV-totG;
-  var mgContrib=totG-totDir;
-  var resultado=mgContrib-totFij-totMOD;
+  var totVar=totV-totG-totDir;
+  var mgBruto=totV-totDir;
+  var mgContrib=mgBruto-totVar-totMOD;
+  var resultado=mgContrib-totFij;
 
   return{clients:clientArr,products:prodArr,categories:catArr,months:monthArr,
     totV:totV,totG:totG,totDir:totDir,totFij:totFij,totMOD:totMOD,totVar:totVar,
