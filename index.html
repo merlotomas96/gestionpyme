@@ -862,6 +862,11 @@ function renderChartBuilder(d,W){
     fields='<div><div class="cb-field-lbl">Segmento (dimensión)</div>'+fselect(cb.xField,'— elegir campo —',"setCB('xField',this.value)")+'</div>'
       +'<div><div class="cb-field-lbl">Valor (métrica)</div>'+fselect(cb.yField,'— elegir campo —',"setCB('yField',this.value)")+'</div>'
       +sortSel();
+  } else if(cb.type==='margen'){
+    fields='<div><div class="cb-field-lbl">Eje X (dimensión)</div>'+fselect(cb.xField,'— elegir campo —',"setCB('xField',this.value)")+'</div>'
+      +'<div><div class="cb-field-lbl">Campo Ventas</div>'+fselect(cb.yField,'— columna de ventas —',"setCB('yField',this.value)")+'</div>'
+      +'<div><div class="cb-field-lbl">Campo Costos</div>'+fselect(cb.colorField,'— columna de costos —',"setCB('colorField',this.value)")+'</div>'
+      +sortSel();
   } else {
     fields='<div><div class="cb-field-lbl">Eje X (dimensión)</div>'+fselect(cb.xField,'— elegir campo —',"setCB('xField',this.value)")+'</div>'
       +'<div><div class="cb-field-lbl">Eje Y principal</div>'+fselect(cb.yField,'— elegir campo —',"setCB('yField',this.value)")+'</div>'
@@ -882,7 +887,7 @@ function renderChartBuilder(d,W){
     +'<div><div class="chtitle" style="margin-bottom:4px">🔬 Constructor de gráficas</div>'
     +'<div class="chsub" style="margin-bottom:14px">Elegí tipo, campos y ejes — actualiza en tiempo real</div>'
     +'<div class="cb-type-grid">'
-    +[{id:'bar',icon:'▬',l:'Barras'},{id:'line',icon:'╱',l:'Línea'},{id:'scatter',icon:'⋯',l:'Scatter'},{id:'pie',icon:'◑',l:'Torta'}]
+    +[{id:'bar',icon:'▬',l:'Barras'},{id:'line',icon:'╱',l:'Línea'},{id:'scatter',icon:'⋯',l:'Scatter'},{id:'pie',icon:'◑',l:'Torta'},{id:'margen',icon:'%',l:'Margen'}]
     .map(function(t){return'<button class="cb-type-btn'+(cb.type===t.id?' active':'')+'" onclick="setCB(\'type\',\''+t.id+'\')">'
       +'<div style="font-size:20px;margin-bottom:3px">'+t.icon+'</div>'+t.l+'</button>';}).join('')
     +'</div>'
@@ -901,7 +906,30 @@ function setCB(key,val){
 // CHART DRAW FUNCTIONS
 // ══════════════════════════════════════════════════════
 var COLORS=['#2A5C45','#C4531A','#1A5FB4','#C9950C','#6B3FA0','#0A7E6A','#A03F10','#0E3A8A','#8B6300','#4A1F70'];
-
+  
+function aggrDataMargen(xCol,yCol,costCol,aggr){
+  var f=S.files['ventas'];if(!f||!xCol||!yCol||!costCol)return[];
+  var map={};
+  f.rows.forEach(function(r){
+    var dim=r[xCol]||'—';
+    var v=num(r[yCol]||0),c=num(r[costCol]||0);
+    if(!map[dim])map[dim]={dim:dim,val:0,costo:0,count:0};
+    map[dim].val+=v;map[dim].costo+=c;map[dim].count++;
+  });
+  var arr=Object.values(map).map(function(r){
+    return{dim:r.dim,val:r.val?Math.round((1-r.costo/r.val)*100):0,count:r.count};
+  });
+  // sort same as aggrData
+  var MESES=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  function fechaVal(s){var str=String(s).toLowerCase();var q=str.match(/q(\d)/);if(q)return parseInt(q[1]);var my=str.match(/([a-z]+)[-\/](\d{4})/);if(my)return parseInt(my[2])*100+MESES.indexOf(my[1].substring(0,3));var y=str.match(/^(\d{4})$/);if(y)return parseInt(y[1])*100;var mi=MESES.indexOf(str.substring(0,3));if(mi>=0)return mi;return 0;}
+  var sb=S.cb.sortBy||'val_desc';
+  if(sb==='val_desc')arr.sort(function(a,b){return b.val-a.val;});
+  else if(sb==='val_asc')arr.sort(function(a,b){return a.val-b.val;});
+  else if(sb==='name_asc')arr.sort(function(a,b){var fa=fechaVal(a.dim),fb=fechaVal(b.dim);return(fa||fb)?fa-fb:String(a.dim).localeCompare(String(b.dim));});
+  else if(sb==='name_desc')arr.sort(function(a,b){var fa=fechaVal(a.dim),fb=fechaVal(b.dim);return(fa||fb)?fb-fa:String(b.dim).localeCompare(String(a.dim));});
+  return arr.slice(0,20);
+}
+  
 function aggrData(xCol,yCol,aggr){
   var f=S.files['ventas'];if(!f||!xCol||!yCol)return[];
   var map={};
@@ -944,6 +972,7 @@ function drawChart(d){
   if(!cb.xField&&!cb.yField){el.innerHTML='<span style="color:var(--t3);font-size:13px">Elegí los campos para ver la gráfica</span>';return;}
   var W=el.offsetWidth||680;var H=280;
   if(cb.type==='scatter')drawScatter(el,cb,W,H);
+  else if(cb.type==='margen')drawMargen(el,cb,W,H);
   else if(cb.type==='pie')drawPie(el,cb,W,H);
   else if(cb.type==='line')drawLine(el,cb,W,H);
   else drawBar(el,cb,W,H);
@@ -1081,7 +1110,41 @@ function drawScatter(el,cb,W,H){
   svg+='<text x="'+(pad.l+cw-4)+'" y="'+(sy(y2t)-5)+'" text-anchor="end" fill="#C4531A" font-size="9" font-family="DM Sans,sans-serif">tendencia</text>';
   svg+='</svg>';el.innerHTML=svg;
 }
-
+function drawMargen(el,cb,W,H){
+  if(!cb.xField||!cb.yField||!cb.colorField){el.innerHTML='<span style="color:var(--t3);font-size:13px">Elegí Eje X, columna de Ventas y columna de Costos</span>';return;}
+  var data=aggrDataMargen(cb.xField,cb.yField,cb.colorField,cb.aggr);
+  if(!data.length){el.innerHTML='<span style="color:var(--t3);font-size:13px">Sin datos</span>';return;}
+  var pad={t:20,r:20,b:56,l:44};
+  var cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  var n=Math.min(data.length,15);
+  var bw=Math.floor(cw/n),gap=4,bwi=Math.max(6,Math.floor(bw-gap*2));
+  var svg=svgBase(W,H);
+  // grid lines at 0, 25, 50, 75, 100%
+  [0,25,50,75,100].forEach(function(p){
+    var y=(pad.t+ch-p/100*ch).toFixed(1);
+    svg+='<line x1="'+pad.l+'" y1="'+y+'" x2="'+(pad.l+cw)+'" y2="'+y+'" stroke="#E3DDD5" stroke-dasharray="3 3"/>'
+      +'<text x="'+(pad.l-4)+'" y="'+y+'" text-anchor="end" dominant-baseline="central" fill="#9E9892" font-size="10" font-family="DM Mono,monospace">'+p+'%</text>';
+  });
+  // threshold line at 30% (reference)
+  var yRef=(pad.t+ch-30/100*ch).toFixed(1);
+  svg+='<line x1="'+pad.l+'" y1="'+yRef+'" x2="'+(pad.l+cw)+'" y2="'+yRef+'" stroke="#C9950C" stroke-width="1.5" stroke-dasharray="6 3" opacity="0.7"/>'
+    +'<text x="'+(pad.l+cw+4)+'" y="'+yRef+'" dominant-baseline="central" fill="#C9950C" font-size="9" font-family="DM Sans,sans-serif">30%</text>';
+  data.slice(0,n).forEach(function(r,i){
+    var x0=pad.l+i*bw+gap;
+    var h1=Math.max(2,Math.round((r.val/100)*ch));
+    var yb=pad.t+ch;
+    var color=r.val>=35?'#2A5C45':r.val>=28?'#C9950C':'#C4531A';
+    var lbl=String(r.dim).length>12?String(r.dim).substring(0,11)+'…':String(r.dim);
+    svg+='<rect x="'+x0+'" y="'+(yb-h1)+'" width="'+bwi+'" height="'+h1+'" fill="'+color+'" rx="2" opacity="0.85"/>';
+    svg+='<text x="'+(x0+bwi/2).toFixed(1)+'" y="'+(yb-h1-4)+'" text-anchor="middle" fill="'+color+'" font-size="9" font-weight="600" font-family="DM Mono,monospace">'+r.val+'%</text>';
+    svg+='<text x="'+(x0+bwi/2).toFixed(1)+'" y="'+(yb+13)+'" text-anchor="middle" fill="#6B6560" font-size="9" font-family="DM Sans,sans-serif">'+lbl+'</text>';
+  });
+  // legend
+  svg+='<rect x="'+pad.l+'" y="3" width="9" height="9" fill="#2A5C45" rx="2"/><text x="'+(pad.l+13)+'" y="11" font-size="10" fill="#6B6560" font-family="DM Sans,sans-serif">≥35% bueno</text>'
+    +'<rect x="'+(pad.l+90)+'" y="3" width="9" height="9" fill="#C9950C" rx="2"/><text x="'+(pad.l+103)+'" y="11" font-size="10" fill="#6B6560" font-family="DM Sans,sans-serif">28–34% medio</text>'
+    +'<rect x="'+(pad.l+195)+'" y="3" width="9" height="9" fill="#C4531A" rx="2"/><text x="'+(pad.l+208)+'" y="11" font-size="10" fill="#6B6560" font-family="DM Sans,sans-serif"><28% bajo</text>';
+  svg+='</svg>';el.innerHTML=svg;
+}
 // ── STATIC CHARTS (for dashboard views) ──
 function areaChart(data,w,h){
   if(!data||!data.length)return'<div style="height:'+h+'px;display:flex;align-items:center;justify-content:center;color:var(--t3);font-size:12px">Sin datos de período</div>';
