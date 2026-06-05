@@ -385,7 +385,20 @@ function hydrate(){
 // ══════════════════════════════════════════════════════
 // UTILS
 // ══════════════════════════════════════════════════════
-function fmtK(n){if(!n||isNaN(n))return'$0';return n>=1000000?'$'+(n/1e6).toFixed(1)+'M':n>=1000?'$'+(n/1000).toFixed(0)+'K':'$'+Math.round(n);}
+// Formato numérico: máx 3 dígitos visibles.
+// < 1.000 → número entero ($850)
+// 1.000 – 999.999 → K con 1 decimal máx ($12.5K)
+// 1.000.000 – 999.999.999 → M con 2 decimales máx ($1.23M)
+// 1.000.000.000+ → MM con 2 decimales máx ($1.50MM)
+function fmtK(n){
+  if(!n||isNaN(n))return'$0';
+  var abs=Math.abs(n);
+  var sign=n<0?'-':'';
+  if(abs>=1000000000) return sign+'$'+(abs/1000000000).toFixed(2).replace(/\.?0+$/,'')+'MM';
+  if(abs>=1000000)    return sign+'$'+(abs/1000000).toFixed(2).replace(/\.?0+$/,'')+'M';
+  if(abs>=1000)       return sign+'$'+(abs/1000).toFixed(1).replace(/\.?0+$/,'')+'K';
+  return sign+'$'+Math.round(abs);
+}
 function pct(a,b){return b?Math.round(a/b*100):0;}
 function getMgC(p){return p>=35?'mgh':p>=28?'mgm':'mgl';}
 function num(v){return parseFloat(String(v).replace(/[^0-9.-]/g,''))||0;}
