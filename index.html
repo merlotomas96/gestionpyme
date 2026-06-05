@@ -151,6 +151,9 @@ select:focus{border-color:var(--accent);}
 .cascade .tot td{background:var(--al);font-weight:600;color:var(--accent);}
 .cascade .wneg td{background:var(--rl);color:var(--red);font-weight:600;}
 .chart-svg{display:block;width:100%;overflow:visible;}
+/* CHART BUILDER */
+.cb-type-btn{transition:all .15s;}
+.cb-type-btn:hover{transform:translateY(-1px);}
 
 /* CHAT */
 .chat-wrap{display:flex;flex-direction:column;height:420px;border:1px solid var(--border);border-radius:var(--r);overflow:hidden;}
@@ -694,7 +697,12 @@ function renderDashboard(){
   else if(S.dashView==='productos') html+=renderProductos(d,W,Wh);
   else html+=renderPnL(d,W);
 
+  // ── CHART BUILDER ──
+  html+=renderChartBuilder(d,W);
+
   el.innerHTML=html;S.tip=null;
+  // draw chart after DOM is ready
+  setTimeout(function(){drawChart(d);},50);
 }
 
 function renderClientes(d,W,Wh){
@@ -788,6 +796,343 @@ function renderPnL(d,W){
 }
 
 // ══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
+// CHART BUILDER
+// ══════════════════════════════════════════════════════════
+// State for chart builder
+if(!S.cb) S.cb={type:'bar',xField:'',yField:'',y2Field:'',colorField:'',orient:'vertical',aggr:'sum'};
+
+function getNumericFields(d){
+  var f=S.files['ventas'];if(!f)return[];
+  var mp=S.mappings['ventas']||{};
+  return f.headers.filter(function(h){
+    var cat=mp[h]||'';
+    return cat==='ventas'||cat==='costos'||cat==='cantidad';
+  });
+}
+function getDimFields(d){
+  var f=S.files['ventas'];if(!f)return[];
+  var mp=S.mappings['ventas']||{};
+  return f.headers.filter(function(h){
+    var cat=mp[h]||'';
+    return cat==='cliente'||cat==='producto'||cat==='fecha';
+  });
+}
+function getAllFields(){
+  var f=S.files['ventas'];if(!f)return[];
+  return f.headers;
+}
+
+function aggregateData(d,dimCol,metricCol,aggr){
+  var f=S.files['ventas'];if(!f||!dimCol||!metricCol)return[];
+  var map={};
+  f.rows.forEach(function(r){
+    var dim=r[dimCol]||'—';
+    var val=parseFloat(String(r[metricCol]||'0').replace(/[^0-9.-]/g,''))||0;
+    if(!map[dim])map[dim]={dim:dim,val:0,count:0};
+    map[dim].val+=val;map[dim].count++;
+  });
+  var arr=Object.values(map);
+  if(aggr==='avg')arr.forEach(function(r){r.val=r.count?r.val/r.count:0;});
+  if(aggr==='count')arr.forEach(function(r){r.val=r.count;});
+  return arr.sort(function(a,b){return b.val-a.val;}).slice(0,20);
+}
+
+function aggregateXY(dimCol,xCol,yCol){
+  var f=S.files['ventas'];if(!f||!xCol||!yCol)return[];
+  return f.rows.map(function(r){
+    return{
+      dim:dimCol?r[dimCol]||'—':'',
+      x:parseFloat(String(r[xCol]||'0').replace(/[^0-9.-]/g,''))||0,
+      y:parseFloat(String(r[yCol]||'0').replace(/[^0-9.-]/g,''))||0,
+    };
+  });
+}
+
+function renderChartBuilder(d,W){
+  var allF=getAllFields();
+  var numF=getNumericFields(d);
+  var dimF=getDimFields(d);
+  var cb=S.cb;
+
+  var typeOpts=[
+    {id:'bar',     icon:'▬', label:'Barras'},
+    {id:'line',    icon:'╱', label:'Línea'},
+    {id:'scatter', icon:'⋯', label:'Scatter'},
+    {id:'pie',     icon:'◑', label:'Torta'},
+  ];
+
+  var fieldOpt=function(val,placeholder,extra){
+    return'<select style="flex:1;background:var(--bg);border:1px solid var(--border2);border-radius:var(--rs);padding:5px 8px;font-size:12px;font-family:var(--font);color:var(--text);cursor:pointer;outline:none;" '+(extra||'')+'>'
+      +'<option value="">'+placeholder+'</option>'
+      +allF.map(function(f){return'<option value="'+f+'"'+(val===f?' selected':'')+'>'+f+'</option>';}).join('')
+      +'</select>';
+  };
+
+  // config panel
+  var configPanel='<div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px">';
+
+  // type selector
+  configPanel+='<div style="grid-column:1/-1"><div style="font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--t3);text-transform:uppercase;margin-bottom:6px">Tipo de gráfico</div>'
+    +'<div style="display:flex;gap:6px">'
+    +typeOpts.map(function(t){
+      return'<button onclick="setCB(\'type\',\''+t.id+'\')" style="flex:1;padding:8px 6px;border:1.5px solid '+(cb.type===t.id?'var(--accent)':'var(--border)')+';border-radius:var(--rs);background:'+(cb.type===t.id?'var(--al)':'var(--surface)')+';cursor:pointer;font-family:var(--font);font-size:12px;color:'+(cb.type===t.id?'var(--accent)':'var(--t2)')+';">'
+        +'<div style="font-size:18px;margin-bottom:2px">'+t.icon+'</div>'+t.label+'</button>';
+    }).join('')
+    +'</div></div>';
+
+  if(cb.type==='scatter'){
+    configPanel+='<div><div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Eje X (numérico)</div>'
+      +fieldOpt(cb.xField,'— elegir campo —','onchange="setCB(\'xField\',this.value)"')+'</div>';
+    configPanel+='<div><div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Eje Y (numérico)</div>'
+      +fieldOpt(cb.yField,'— elegir campo —','onchange="setCB(\'yField\',this.value)"')+'</div>';
+    configPanel+='<div><div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Color / etiqueta</div>'
+      +fieldOpt(cb.colorField,'— opcional —','onchange="setCB(\'colorField\',this.value)"')+'</div>';
+  } else if(cb.type==='pie'){
+    configPanel+='<div><div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Segmento (dimensión)</div>'
+      +fieldOpt(cb.xField,'— elegir campo —','onchange="setCB(\'xField\',this.value)"')+'</div>';
+    configPanel+='<div><div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Valor (métrica)</div>'
+      +fieldOpt(cb.yField,'— elegir campo —','onchange="setCB(\'yField\',this.value)"')+'</div>';
+  } else {
+    configPanel+='<div><div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">'+(cb.type==='line'?'Eje X / Período':'Eje X (dimensión)')+'</div>'
+      +fieldOpt(cb.xField,'— elegir campo —','onchange="setCB(\'xField\',this.value)"')+'</div>';
+    configPanel+='<div><div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Eje Y (métrica)</div>'
+      +fieldOpt(cb.yField,'— elegir campo —','onchange="setCB(\'yField\',this.value)"')+'</div>';
+    configPanel+='<div><div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Segunda métrica (opcional)</div>'
+      +fieldOpt(cb.y2Field,'— ninguna —','onchange="setCB(\'y2Field\',this.value)"')+'</div>';
+    configPanel+='<div><div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Agregación</div>'
+      +'<select style="width:100%;background:var(--bg);border:1px solid var(--border2);border-radius:var(--rs);padding:5px 8px;font-size:12px;font-family:var(--font);color:var(--text);cursor:pointer;outline:none;" onchange="setCB(\'aggr\',this.value)">'
+      +['sum','avg','count'].map(function(a){return'<option value="'+a+'"'+(cb.aggr===a?' selected':'')+'>'+{sum:'Suma',avg:'Promedio',count:'Conteo'}[a]+'</option>';}).join('')
+      +'</select></div>';
+    if(cb.type==='bar'){
+      configPanel+='<div><div style="font-size:11px;font-weight:600;color:var(--t3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px">Orientación</div>'
+        +'<div style="display:flex;gap:6px">'
+        +[{v:'vertical',l:'Vertical ↑'},{v:'horizontal',l:'Horizontal →'}].map(function(o){
+          return'<button onclick="setCB(\'orient\',\''+o.v+'\')" style="flex:1;padding:6px;border:1px solid '+(cb.orient===o.v?'var(--accent)':'var(--border)')+';border-radius:var(--rs);background:'+(cb.orient===o.v?'var(--al)':'var(--surface)')+';cursor:pointer;font-size:11px;font-family:var(--font);color:'+(cb.orient===o.v?'var(--accent)':'var(--t2)')+';">'+o.l+'</button>';
+        }).join('')
+        +'</div></div>';
+    }
+  }
+
+  configPanel+='</div>';
+
+  return'<div class="ccrd cfull" style="margin-top:16px;border:2px solid var(--border);background:var(--s2)">'
+    +'<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">'
+    +'<div><div class="chtitle">🔬 Constructor de gráficas</div><div class="chsub">Elegí tipo, campos y ejes — la gráfica se actualiza en tiempo real</div></div>'
+    +'</div>'
+    +configPanel
+    +'<div id="cb-chart" style="min-height:280px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);display:flex;align-items:center;justify-content:center">'
+    +'<span style="color:var(--t3);font-size:13px">Configurá los campos para ver la gráfica</span>'
+    +'</div>'
+    +'</div>';
+}
+
+function setCB(key,val){
+  S.cb[key]=val;
+  var d=computeFromFiles();
+  if(d) setTimeout(function(){drawChart(d);},10);
+  renderDashboard();
+}
+
+function drawChart(d){
+  var el=document.getElementById('cb-chart');
+  if(!el)return;
+  var cb=S.cb;
+  var f=S.files['ventas'];
+  if(!f){el.innerHTML='<span style="color:var(--t3);font-size:13px">Cargá el archivo de Ventas para usar el constructor</span>';return;}
+  if(!cb.xField&&!cb.yField){el.innerHTML='<span style="color:var(--t3);font-size:13px">Elegí los campos para ver la gráfica</span>';return;}
+
+  var W=el.offsetWidth||700;
+  var H=280;
+
+  if(cb.type==='scatter') drawScatter(el,f,cb,W,H);
+  else if(cb.type==='pie') drawPie(el,f,cb,W,H);
+  else if(cb.type==='line') drawLine(el,f,cb,W,H);
+  else drawBar(el,f,cb,W,H);
+}
+
+var COLORS=['#2A5C45','#C4531A','#1A5FB4','#C9950C','#6B3FA0','#0A7E6A','#A03F10','#0E3A8A','#8B6300','#4A1F70'];
+
+function drawBar(el,f,cb,W,H){
+  if(!cb.xField||!cb.yField){el.innerHTML='<span style="color:var(--t3);font-size:13px">Elegí Eje X y Eje Y</span>';return;}
+  var data=aggregateData(null,cb.xField,cb.yField,cb.aggr);
+  var data2=cb.y2Field?aggregateData(null,cb.xField,cb.y2Field,cb.aggr):[];
+  var map2={};data2.forEach(function(r){map2[r.dim]=r.val;});
+
+  var horiz=cb.orient==='horizontal';
+  var pad=horiz?{t:10,r:60,b:10,l:120}:{t:20,r:20,b:60,l:60};
+  var cw=W-pad.l-pad.r, ch=H-pad.t-pad.b;
+  var n=Math.min(data.length,15);
+  var maxV=Math.max.apply(null,data.slice(0,n).map(function(r){return r.val;}))*(cb.y2Field?1.2:1.1)||1;
+  if(cb.y2Field){var maxV2=Math.max.apply(null,data.slice(0,n).map(function(r){return map2[r.dim]||0;}))*1.1||1;maxV=Math.max(maxV,maxV2);}
+
+  var bw=horiz?ch/n:cw/n;
+  var gap=horiz?4:4;
+  var bwi=cb.y2Field?Math.floor((bw-gap*3)/2):Math.floor(bw-gap*2);
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:'+H+'px;display:block;overflow:visible">';
+  // grid lines
+  [0,.25,.5,.75,1].forEach(function(p){
+    var v=maxV*p;
+    if(horiz){var x2=pad.l+p*cw;svg+='<line x1="'+x2+'" y1="'+pad.t+'" x2="'+x2+'" y2="'+(pad.t+ch)+'" stroke="#E3DDD5" stroke-dasharray="3 3"/><text x="'+x2+'" y="'+(pad.t+ch+14)+'" text-anchor="middle" fill="#9E9892" font-size="10" font-family="DM Mono,monospace">'+fmtK(v)+'</text>';}
+    else{var y2=(pad.t+ch-p*ch).toFixed(1);svg+='<line x1="'+pad.l+'" y1="'+y2+'" x2="'+(pad.l+cw)+'" y2="'+y2+'" stroke="#E3DDD5" stroke-dasharray="3 3"/><text x="'+(pad.l-5)+'" y="'+y2+'" text-anchor="end" dominant-baseline="central" fill="#9E9892" font-size="10" font-family="DM Mono,monospace">'+fmtK(v)+'</text>';}
+  });
+  // bars
+  data.slice(0,n).forEach(function(r,i){
+    var h1=Math.max(2,Math.round((r.val/maxV)*(horiz?cw:ch)));
+    var h2=cb.y2Field?Math.max(1,Math.round(((map2[r.dim]||0)/maxV)*(horiz?cw:ch))):0;
+    var lbl=String(r.dim).length>14?String(r.dim).substring(0,13)+'…':String(r.dim);
+    if(horiz){
+      var y0=pad.t+i*bw+gap;
+      svg+='<rect x="'+pad.l+'" y="'+y0+'" width="'+h1+'" height="'+bwi+'" fill="'+COLORS[0]+'" rx="2"/>';
+      if(cb.y2Field)svg+='<rect x="'+pad.l+'" y="'+(y0+bwi+gap)+'" width="'+h2+'" height="'+bwi+'" fill="'+COLORS[1]+'" rx="2"/>';
+      svg+='<text x="'+(pad.l-6)+'" y="'+(y0+bwi/2)+'" text-anchor="end" dominant-baseline="central" fill="#6B6560" font-size="10" font-family="DM Sans,sans-serif">'+lbl+'</text>';
+      svg+='<text x="'+(pad.l+h1+4)+'" y="'+(y0+bwi/2)+'" dominant-baseline="central" fill="'+COLORS[0]+'" font-size="10" font-weight="600" font-family="DM Mono,monospace">'+fmtK(r.val)+'</text>';
+    } else {
+      var x0=pad.l+i*bw+gap;
+      svg+='<rect x="'+x0+'" y="'+(pad.t+ch-h1)+'" width="'+bwi+'" height="'+h1+'" fill="'+COLORS[0]+'" rx="2"/>';
+      if(cb.y2Field)svg+='<rect x="'+(x0+bwi+gap)+'" y="'+(pad.t+ch-h2)+'" width="'+bwi+'" height="'+h2+'" fill="'+COLORS[1]+'" rx="2"/>';
+      svg+='<text x="'+(x0+bwi/2+(cb.y2Field?bwi/2+gap/2:0))+'" y="'+(pad.t+ch+14)+'" text-anchor="middle" fill="#6B6560" font-size="9" font-family="DM Sans,sans-serif">'+lbl+'</text>';
+    }
+  });
+  // legend
+  if(cb.y2Field){
+    svg+='<rect x="'+(pad.l)+'" y="4" width="10" height="10" fill="'+COLORS[0]+'" rx="2"/>'
+      +'<text x="'+(pad.l+14)+'" y="13" font-size="10" fill="#6B6560" font-family="DM Sans,sans-serif">'+cb.yField+'</text>'
+      +'<rect x="'+(pad.l+cb.yField.length*6+24)+'" y="4" width="10" height="10" fill="'+COLORS[1]+'" rx="2"/>'
+      +'<text x="'+(pad.l+cb.yField.length*6+38)+'" y="13" font-size="10" fill="#6B6560" font-family="DM Sans,sans-serif">'+cb.y2Field+'</text>';
+  }
+  svg+='</svg>';
+  el.innerHTML=svg;
+}
+
+function drawLine(el,f,cb,W,H){
+  if(!cb.xField||!cb.yField){el.innerHTML='<span style="color:var(--t3);font-size:13px">Elegí Eje X y Eje Y</span>';return;}
+  var data=aggregateData(null,cb.xField,cb.yField,cb.aggr);
+  var data2=cb.y2Field?aggregateData(null,cb.xField,cb.y2Field,cb.aggr):[];
+  // align data2 to same x order
+  var map2={};data2.forEach(function(r){map2[r.dim]=r.val;});
+
+  var pad={t:20,r:20,b:50,l:60};
+  var cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  var n=data.length;if(!n){el.innerHTML='<span style="color:var(--t3);font-size:13px">Sin datos para los campos seleccionados</span>';return;}
+  var maxV=Math.max.apply(null,data.map(function(r){return r.val;}).concat(data2.map(function(r){return r.val;})))*1.1||1;
+  var xs=data.map(function(_,i){return pad.l+(n>1?i/(n-1):0.5)*cw;});
+  function yf(v){return pad.t+ch-(v/maxV)*ch;}
+
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:'+H+'px;display:block;overflow:visible">';
+  [0,.25,.5,.75,1].forEach(function(p){
+    var y2=(pad.t+ch-p*ch).toFixed(1);
+    svg+='<line x1="'+pad.l+'" y1="'+y2+'" x2="'+(pad.l+cw)+'" y2="'+y2+'" stroke="#E3DDD5" stroke-dasharray="3 3"/>'
+      +'<text x="'+(pad.l-5)+'" y="'+y2+'" text-anchor="end" dominant-baseline="central" fill="#9E9892" font-size="10" font-family="DM Mono,monospace">'+fmtK(maxV*p)+'</text>';
+  });
+  data.forEach(function(r,i){
+    var lbl=String(r.dim).length>10?String(r.dim).substring(0,9)+'…':String(r.dim);
+    svg+='<text x="'+xs[i]+'" y="'+(pad.t+ch+14)+'" text-anchor="middle" fill="#9E9892" font-size="9" font-family="DM Sans,sans-serif">'+lbl+'</text>';
+  });
+  // line 1
+  var p1='M'+xs.map(function(x,i){return x.toFixed(1)+','+yf(data[i].val).toFixed(1);}).join('L');
+  var f1=p1+'L'+xs[xs.length-1].toFixed(1)+','+(pad.t+ch)+'L'+xs[0].toFixed(1)+','+(pad.t+ch)+'Z';
+  svg+='<defs><linearGradient id="lg1" x1="0" y1="0" x2="0" y2="1"><stop offset="5%" stop-color="'+COLORS[0]+'" stop-opacity="0.15"/><stop offset="95%" stop-color="'+COLORS[0]+'" stop-opacity="0.02"/></linearGradient></defs>';
+  svg+='<path d="'+f1+'" fill="url(#lg1)"/>';
+  svg+='<path d="'+p1+'" fill="none" stroke="'+COLORS[0]+'" stroke-width="2.5" stroke-linejoin="round"/>';
+  xs.forEach(function(x,i){svg+='<circle cx="'+x.toFixed(1)+'" cy="'+yf(data[i].val).toFixed(1)+'" r="4" fill="'+COLORS[0]+'" stroke="#fff" stroke-width="2"/>';});
+  // line 2
+  if(cb.y2Field&&data2.length){
+    var vals2=data.map(function(r){return map2[r.dim]||0;});
+    var p2='M'+xs.map(function(x,i){return x.toFixed(1)+','+yf(vals2[i]).toFixed(1);}).join('L');
+    svg+='<path d="'+p2+'" fill="none" stroke="'+COLORS[1]+'" stroke-width="2.5" stroke-linejoin="round" stroke-dasharray="6 3"/>';
+    xs.forEach(function(x,i){svg+='<circle cx="'+x.toFixed(1)+'" cy="'+yf(vals2[i]).toFixed(1)+'" r="4" fill="'+COLORS[1]+'" stroke="#fff" stroke-width="2"/>';});
+  }
+  // legend
+  svg+='<rect x="'+pad.l+'" y="3" width="10" height="10" fill="'+COLORS[0]+'" rx="2"/>'
+    +'<text x="'+(pad.l+14)+'" y="12" font-size="10" fill="#6B6560" font-family="DM Sans,sans-serif">'+cb.yField+'</text>';
+  if(cb.y2Field){
+    svg+='<rect x="'+(pad.l+cb.yField.length*6+24)+'" y="3" width="10" height="10" fill="'+COLORS[1]+'" rx="2"/>'
+      +'<text x="'+(pad.l+cb.yField.length*6+38)+'" y="12" font-size="10" fill="#6B6560" font-family="DM Sans,sans-serif">'+cb.y2Field+'</text>';
+  }
+  svg+='</svg>';
+  el.innerHTML=svg;
+}
+
+function drawPie(el,f,cb,W,H){
+  if(!cb.xField||!cb.yField){el.innerHTML='<span style="color:var(--t3);font-size:13px">Elegí Segmento y Valor</span>';return;}
+  var data=aggregateData(null,cb.xField,cb.yField,cb.aggr).slice(0,8);
+  var total=data.reduce(function(s,r){return s+r.val;},0)||1;
+  var cx=Math.round(W*0.38),cy=H/2,r=Math.min(cy-20,cx-20,90);
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:'+H+'px;display:block">';
+  var angle=-Math.PI/2;
+  data.forEach(function(row,i){
+    var sweep=2*Math.PI*(row.val/total);
+    var x1=cx+r*Math.cos(angle),y1=cy+r*Math.sin(angle);
+    var x2=cx+r*Math.cos(angle+sweep),y2=cy+r*Math.sin(angle+sweep);
+    var large=sweep>Math.PI?1:0;
+    svg+='<path d="M'+cx+','+cy+' L'+x1.toFixed(1)+','+y1.toFixed(1)+' A'+r+','+r+' 0 '+large+',1 '+x2.toFixed(1)+','+y2.toFixed(1)+' Z" fill="'+COLORS[i%COLORS.length]+'" stroke="#fff" stroke-width="2"/>';
+    // label on slice center
+    var midA=angle+sweep/2;
+    var lx=cx+(r*0.65)*Math.cos(midA),ly=cy+(r*0.65)*Math.sin(midA);
+    var p2=Math.round(row.val/total*100);
+    if(p2>6)svg+='<text x="'+lx.toFixed(1)+'" y="'+ly.toFixed(1)+'" text-anchor="middle" dominant-baseline="central" fill="#fff" font-size="11" font-weight="600" font-family="DM Sans,sans-serif">'+p2+'%</text>';
+    angle+=sweep;
+  });
+  // donut hole
+  svg+='<circle cx="'+cx+'" cy="'+cy+'" r="'+(r*0.4)+'" fill="var(--surface)"/>';
+  svg+='<text x="'+cx+'" y="'+(cy-6)+'" text-anchor="middle" fill="var(--t2)" font-size="11" font-family="DM Sans,sans-serif">'+cb.xField+'</text>';
+  svg+='<text x="'+cx+'" y="'+(cy+10)+'" text-anchor="middle" fill="var(--text)" font-size="13" font-weight="600" font-family="DM Mono,monospace">'+fmtK(total)+'</text>';
+  // legend
+  var lx0=cx+r+24,ly0=cy-data.length*12;
+  data.forEach(function(row,i){
+    var lbl=String(row.dim).length>16?String(row.dim).substring(0,15)+'…':String(row.dim);
+    svg+='<rect x="'+lx0+'" y="'+(ly0+i*22)+'" width="11" height="11" fill="'+COLORS[i%COLORS.length]+'" rx="2"/>';
+    svg+='<text x="'+(lx0+15)+'" y="'+(ly0+i*22+9)+'" fill="#6B6560" font-size="11" font-family="DM Sans,sans-serif">'+lbl+'</text>';
+    svg+='<text x="'+(W-8)+'" y="'+(ly0+i*22+9)+'" text-anchor="end" fill="var(--t3)" font-size="10" font-family="DM Mono,monospace">'+fmtK(row.val)+'</text>';
+  });
+  svg+='</svg>';
+  el.innerHTML=svg;
+}
+
+function drawScatter(el,f,cb,W,H){
+  if(!cb.xField||!cb.yField){el.innerHTML='<span style="color:var(--t3);font-size:13px">Elegí Eje X y Eje Y</span>';return;}
+  var pts=aggregateXY(cb.colorField,cb.xField,cb.yField);
+  if(!pts.length){el.innerHTML='<span style="color:var(--t3);font-size:13px">Sin datos</span>';return;}
+  var pad={t:20,r:20,b:40,l:60};
+  var cw=W-pad.l-pad.r,ch=H-pad.t-pad.b;
+  var maxX=Math.max.apply(null,pts.map(function(p){return p.x;}))*1.1||1;
+  var maxY=Math.max.apply(null,pts.map(function(p){return p.y;}))*1.1||1;
+  function sx(v){return pad.l+(v/maxX)*cw;}
+  function sy(v){return pad.t+ch-(v/maxY)*ch;}
+  // unique dims for color
+  var dims={};pts.forEach(function(p){dims[p.dim]=1;});
+  var dimList=Object.keys(dims);
+  var dimColor={};dimList.forEach(function(d,i){dimColor[d]=COLORS[i%COLORS.length];});
+
+  var svg='<svg viewBox="0 0 '+W+' '+H+'" style="width:100%;height:'+H+'px;display:block;overflow:visible">';
+  [0,.25,.5,.75,1].forEach(function(p){
+    var y2=sy(maxY*p).toFixed(1);
+    svg+='<line x1="'+pad.l+'" y1="'+y2+'" x2="'+(pad.l+cw)+'" y2="'+y2+'" stroke="#E3DDD5" stroke-dasharray="3 3"/>'
+      +'<text x="'+(pad.l-5)+'" y="'+y2+'" text-anchor="end" dominant-baseline="central" fill="#9E9892" font-size="10" font-family="DM Mono,monospace">'+fmtK(maxY*p)+'</text>';
+    var x2=sx(maxX*p).toFixed(1);
+    svg+='<line x1="'+x2+'" y1="'+pad.t+'" x2="'+x2+'" y2="'+(pad.t+ch)+'" stroke="#E3DDD5" stroke-dasharray="3 3"/>'
+      +'<text x="'+x2+'" y="'+(pad.t+ch+14)+'" text-anchor="middle" fill="#9E9892" font-size="10" font-family="DM Mono,monospace">'+fmtK(maxX*p)+'</text>';
+  });
+  // axis labels
+  svg+='<text x="'+(pad.l+cw/2)+'" y="'+(pad.t+ch+30)+'" text-anchor="middle" fill="#6B6560" font-size="11" font-family="DM Sans,sans-serif">'+cb.xField+'</text>';
+  // points
+  pts.forEach(function(p){
+    var col=cb.colorField?dimColor[p.dim]:COLORS[0];
+    svg+='<circle cx="'+sx(p.x).toFixed(1)+'" cy="'+sy(p.y).toFixed(1)+'" r="5" fill="'+col+'" fill-opacity="0.75" stroke="'+col+'" stroke-width="1"/>';
+  });
+  // trend line (simple linear regression)
+  var n=pts.length,sx2=0,sy2=0,sxy=0,sx3=0;
+  pts.forEach(function(p){sx2+=p.x;sy2+=p.y;sxy+=p.x*p.y;sx3+=p.x*p.x;});
+  var slope=(n*sxy-sx2*sy2)/(n*sx3-sx2*sx2)||0;
+  var intercept=(sy2-slope*sx2)/n;
+  var x1t=0,y1t=slope*x1t+intercept,x2t=maxX/1.1,y2t=slope*x2t+intercept;
+  svg+='<line x1="'+sx(x1t).toFixed(1)+'" y1="'+sy(y1t).toFixed(1)+'" x2="'+sx(x2t).toFixed(1)+'" y2="'+sy(y2t).toFixed(1)+'" stroke="#C4531A" stroke-width="1.5" stroke-dasharray="5 3" opacity="0.6"/>';
+  svg+='<text x="'+(pad.l+cw-4)+'" y="'+(sy(y2t)+4)+'" text-anchor="end" fill="#C4531A" font-size="9" font-family="DM Sans,sans-serif">tendencia</text>';
+  svg+='</svg>';
+  el.innerHTML=svg;
+}
+
 // CHARTS
 // ══════════════════════════════════════════════════════════
 function areaChart(data,w,h){
