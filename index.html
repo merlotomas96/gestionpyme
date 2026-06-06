@@ -963,8 +963,8 @@ function renderDashboard(){
     +[{id:'clientes',l:'Clientes'},{id:'productos',l:'Productos'},{id:'costos',l:'Costos'},{id:'pnl',l:'P&L'}]
     .map(function(t){return'<button class="dtab'+(S.dashView===t.id?' active':'')+'" onclick="setDV(\''+t.id+'\')">'+t.l+'</button>';}).join('')
     +'</div></div>';
-  var W=Math.min(1100,(document.documentElement.clientWidth||1000)-240);
-  var Wh=Math.max(280,Math.round(W/2)-10);
+  var W=Math.min(1100,(document.documentElement.clientWidth||1000)-280);
+  var Wh=Math.max(280,Math.round(W/2)-20);
   html+='<div class="kpi-row">'
     +'<div class="kpi-tile"><div class="kpi-label">Ventas totales</div><div class="kpi-val">'+fmtK(d.totV)+'</div><div class="kpi-delta up">'+d.clients.length+' clientes activos</div></div>'
     +'<div class="kpi-tile"><div class="kpi-label">Margen bruto</div><div class="kpi-val up">'+fmtK(d.totG)+'</div><div class="kpi-delta up">'+pct(d.totG,d.totV)+'% sobre ventas</div></div>'
@@ -1050,7 +1050,7 @@ function renderCostos(d,W,Wh){
     +'<div class="tscroll"><table><thead><tr><th>Categoría</th><th class="r">Monto</th><th class="r">%</th></tr></thead><tbody>'
     +catArr.map(function(c){return'<tr><td style="font-weight:500">'+c.cat+'</td><td class="r">'+fmtK(c.monto)+'</td><td class="r"><div style="display:flex;align-items:center;gap:6px;justify-content:flex-end"><div style="width:50px;background:var(--bg);border-radius:2px;height:5px;overflow:hidden"><div style="background:var(--red);width:'+pct(c.monto,totC)+'%;height:100%;border-radius:2px"></div></div><span style="font-family:var(--mono);font-size:10px;color:var(--t3)">'+pct(c.monto,totC)+'%</span></div></td></tr>';}).join('')
     +'</tbody></table></div></div>'
-    +(mesArr.length?'<div class="chart-card chart-full"><div class="chart-title">Evolución de costos</div><div class="chart-sub">Costos directos y fijos por período</div>'+areaChart(mesArr,W,160)+'</div>':'')
+    +(mesArr.length?'<div class="chart-card chart-full"><div class="chart-title">Evolución de costos</div><div class="chart-sub">Costos directos y fijos por período</div><div style="width:100%;overflow:hidden">'+areaChart(mesArr,W,160)+'</div></div>':'')
     +'</div>';
 }
 
@@ -1487,7 +1487,23 @@ function importState(e){
     +'<div style="font-size:10px;color:var(--t3)">La clave se guarda solo en tu navegador. <a href="https://console.anthropic.com" target="_blank" style="color:var(--accent)">Obtener clave →</a></div></div></div>'
     +'<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;box-shadow:var(--sh)">'
     +'<div style="padding:14px 18px;border-bottom:1px solid var(--border)"><div style="font-size:12px;font-weight:600">Datos cargados</div><div style="font-size:10px;color:var(--t3);margin-top:2px">'+fc+' archivo(s) · '+rows+' filas · '+dC+' demo · '+(fc-dC)+' real(es)</div></div>'
-    +'<div style="padding:14px 18px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn danger" onclick="if(confirm(\'¿Borrar todo?\'))clearAll()">Borrar todo</button><button class="btn out" onclick="if(confirm(\'¿Borrar solo ejemplos?\'))removeAllDemo()">Borrar solo ejemplos</button></div></div></div>';
++'<div class="tscroll" style="border-top:1px solid var(--border)">'
++'<table><thead><tr><th>Módulo</th><th>Archivo</th><th>Estado</th><th class="r">Filas</th><th class="r">Columnas</th></tr></thead><tbody>'
++MODULES.map(function(m){
+  var f=S.files[m.id];
+  if(!f)return'<tr><td style="color:var(--t3)">'+m.icon+' '+m.title+'</td><td style="color:var(--t3);font-family:var(--mono);font-size:10px">—</td><td><span style="font-size:9px;background:var(--bg);border:1px solid var(--border);padding:1px 6px;border-radius:3px;color:var(--t3)">Sin cargar</span></td><td class="r" style="color:var(--t3)">—</td><td class="r" style="color:var(--t3)">—</td></tr>';
+  return'<tr><td style="font-weight:500">'+m.icon+' '+m.title+'</td>'
+    +'<td style="font-family:var(--mono);font-size:10px;color:var(--t2)">'+f.name+'</td>'
+    +'<td><span style="font-size:9px;padding:1px 6px;border-radius:3px;font-weight:500;background:'+(f.isDemo?'var(--gl)':'var(--al)')+';color:'+(f.isDemo?'var(--gold)':'var(--accent)')+';">'+(f.isDemo?'Demo':'Real')+'</span></td>'
+    +'<td class="r">'+f.rows.length+'</td>'
+    +'<td class="r">'+f.headers.length+'</td></tr>';
+}).join('')
++'</tbody></table></div>'
++'<div style="padding:12px 18px;display:flex;gap:8px;flex-wrap:wrap;border-top:1px solid var(--border)">'
++'<button class="btn danger" onclick="if(confirm(\'¿Borrar todo?\'))clearAll()">Borrar todo</button>'
++'<button class="btn out" onclick="if(confirm(\'¿Borrar solo ejemplos?\'))removeAllDemo()">Borrar solo ejemplos</button>'
++'<button class="btn out" onclick="nav(\'archivos\')" style="margin-left:auto">Gestionar archivos →</button>'
++'</div></div></div>';
 }
 
 // ══════════════════════════════════════════════════════
