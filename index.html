@@ -58,8 +58,10 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13
 .page.active{display:block;}
 
 /* ── HOME HERO ── */
-.home-hero{background:var(--accent);padding:60px 56px 52px;color:#fff;position:relative;overflow:hidden;}
-.home-hero::after{content:'';position:absolute;right:0;top:0;width:40%;height:100%;background:linear-gradient(135deg,transparent 40%,rgba(255,255,255,.03) 100%);pointer-events:none;}
+.home-hero{background:var(--accent);padding:60px 56px 52px;color:#fff;position:relative;overflow:hidden;display:grid;grid-template-columns:1fr 1fr;gap:48px;align-items:center;}
+.home-hero::after{content:'';position:absolute;right:0;top:0;width:50%;height:100%;background:linear-gradient(135deg,transparent 30%,rgba(255,255,255,.025) 100%);pointer-events:none;}
+.hero-left{}
+.hero-right{position:relative;z-index:1;}
 .hero-eyebrow{font-size:10px;font-weight:500;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5);margin-bottom:18px;display:flex;align-items:center;gap:8px;}
 .hero-eyebrow::before{content:'';display:block;width:16px;height:1px;background:rgba(255,255,255,.3);}
 .hero-h{font-size:38px;font-weight:300;letter-spacing:-.04em;line-height:1.1;margin-bottom:8px;}
@@ -77,6 +79,32 @@ body{font-family:var(--font);background:var(--bg);color:var(--text);font-size:13
 .hero-gi-label{font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);margin-bottom:8px;}
 .hero-gi-text{font-size:13px;color:rgba(255,255,255,.85);line-height:1.65;font-weight:300;}
 .hero-gi-text strong{font-weight:600;color:#fff;}
+.dash-mock{background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:10px;padding:14px;backdrop-filter:blur(4px);}
+.mock-topbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;}
+.mock-title{font-size:10px;font-weight:600;color:rgba(255,255,255,.9);letter-spacing:.04em;}
+.mock-tabs{display:flex;gap:3px;}
+.mock-tab{font-size:9px;padding:2px 8px;border-radius:3px;color:rgba(255,255,255,.4);}
+.mock-tab.active{background:rgba(255,255,255,.15);color:#fff;}
+.mock-kpis{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:10px;}
+.mock-kpi{background:rgba(255,255,255,.08);border-radius:6px;padding:8px 10px;}
+.mock-kpi-lbl{font-size:8px;color:rgba(255,255,255,.45);letter-spacing:.06em;text-transform:uppercase;margin-bottom:4px;}
+.mock-kpi-val{font-size:15px;font-weight:700;font-family:var(--mono);color:#fff;}
+.mock-kpi-delta{font-size:8px;margin-top:2px;}
+.mock-kpi-delta.up{color:#6FD4A0;}
+.mock-kpi-delta.dn{color:#F4886A;}
+.mock-chart-area{background:rgba(255,255,255,.05);border-radius:6px;padding:10px;margin-bottom:8px;}
+.mock-chart-label{font-size:8px;color:rgba(255,255,255,.4);margin-bottom:8px;letter-spacing:.05em;text-transform:uppercase;}
+.mock-rows{display:flex;flex-direction:column;gap:5px;}
+.mock-row{display:flex;align-items:center;gap:8px;}
+.mock-row-lbl{font-size:9px;color:rgba(255,255,255,.6);width:90px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.mock-row-bar-wrap{flex:1;background:rgba(255,255,255,.08);border-radius:2px;height:6px;overflow:hidden;}
+.mock-row-bar{height:100%;border-radius:2px;transition:width .4s;}
+.mock-row-val{font-size:9px;font-family:var(--mono);color:rgba(255,255,255,.7);width:36px;text-align:right;flex-shrink:0;}
+.mock-badges{display:flex;gap:5px;flex-wrap:wrap;}
+.mock-badge{font-size:8px;padding:2px 7px;border-radius:3px;font-family:var(--mono);}
+.mock-badge.g{background:rgba(111,212,160,.2);color:#6FD4A0;}
+.mock-badge.r{background:rgba(244,136,106,.2);color:#F4886A;}
+.mock-badge.y{background:rgba(212,180,80,.2);color:#D4B450;}
 
 /* ── HOME BODY ── */
 .home-body{padding:52px 56px;max-width:1200px;}
@@ -355,6 +383,8 @@ textarea::placeholder{color:var(--t3);}
   .kpi-row{padding:16px 20px 0;}
   .dash-header{padding:12px 20px;}
   .demo-bar{padding:6px 20px;}
+  .home-hero{grid-template-columns:1fr;}
+  .hero-right{display:none;}
 }
 @media(max-width:640px){
   .sidebar{display:none;}
@@ -690,7 +720,7 @@ function renderPage(p){
 // ══════════════════════════════════════════════════════
 function renderHome(){
   var el=document.getElementById('page-home');if(!el)return;
-  el.innerHTML='<div class="home-hero">'
+  el.innerHTML='<div class="home-hero"><div class="hero-left">'
     +'<div class="hero-eyebrow">Control de gestión para PyMEs</div>'
     +'<div class="hero-h">Información precisa.<br><strong>Decisiones más inteligentes.</strong></div>'
     +'<div class="hero-hr"></div>'
@@ -700,7 +730,29 @@ function renderHome(){
     +'<div class="hero-gi"><div class="hero-gi-label">El problema que resuelve</div><div class="hero-gi-text">Tus datos están en Excel pero <strong>no te dicen lo que necesitás saber</strong> para crecer con rentabilidad.</div></div>'
     +'<div class="hero-gi"><div class="hero-gi-label">Cómo funciona</div><div class="hero-gi-text">Subís tus archivos, la herramienta los conecta y te entrega <strong>dashboards, KPIs y análisis</strong> listos para usar.</div></div>'
     +'<div class="hero-gi"><div class="hero-gi-label">El resultado</div><div class="hero-gi-text">Sabés exactamente <strong>qué cliente, producto o categoría</strong> te genera valor real — y cuál te lo quita.</div></div>'
+    +'</div>'  // cierra hero-grid
+    +'</div>'  // cierra hero-left
+    +'<div class="hero-right">'
+    +'<div class="dash-mock">'
+    +'<div class="mock-topbar"><span class="mock-title">Dashboard · Clientes</span><div class="mock-tabs"><span class="mock-tab active">Clientes</span><span class="mock-tab">Productos</span><span class="mock-tab">P&L</span></div></div>'
+    +'<div class="mock-kpis">'
+    +'<div class="mock-kpi"><div class="mock-kpi-lbl">Ventas</div><div class="mock-kpi-val">$12.4M</div><div class="mock-kpi-delta up">↑ 18%</div></div>'
+    +'<div class="mock-kpi"><div class="mock-kpi-lbl">Margen bruto</div><div class="mock-kpi-val">$3.2M</div><div class="mock-kpi-delta up">26.5%</div></div>'
+    +'<div class="mock-kpi"><div class="mock-kpi-lbl">Resultado op.</div><div class="mock-kpi-val">$980K</div><div class="mock-kpi-delta up">↑ 7.9%</div></div>'
+    +'</div>'
+    +'<div class="mock-chart-area">'
+    +'<div class="mock-chart-label">Top clientes — ventas vs margen</div>'
+    +'<div class="mock-rows">'
+    +[{l:'ElectroMax SA',v:'$3.7M',w:100,m:20,mc:'r'},{l:'HogarPlus SRL',v:'$1.9M',w:51,m:30,mc:'y'},{l:'Distribuidora Norte',v:'$980K',w:26,m:35,mc:'g'},{l:'Almacén Central',v:'$840K',w:23,m:35,mc:'g'},{l:'Kiosco del Centro',v:'$720K',w:19,m:38,mc:'g'}]
+    .map(function(r){return'<div class="mock-row"><div class="mock-row-lbl">'+r.l+'</div><div class="mock-row-bar-wrap"><div class="mock-row-bar" style="width:'+r.w+'%;background:'+(r.mc==='g'?'rgba(111,212,160,.6)':r.mc==='y'?'rgba(212,180,80,.5)':'rgba(244,136,106,.5)')+'"></div></div><div class="mock-row-val">'+r.v+'</div><span class="mock-badge '+r.mc+'">'+r.m+'%</span></div>';}).join('')
     +'</div></div>'
+    +'<div class="mock-badges">'
+    +'<span class="mock-badge g">✓ 10 clientes activos</span>'
+    +'<span class="mock-badge y">⚠ Concentración: 30%</span>'
+    +'<span class="mock-badge r">↓ Margen ElectroMax bajo meta</span>'
+    +'</div>'
+    +'</div></div>'  // cierra dash-mock y hero-right
+    +'</div>'  // cierra home-hero
     +'<div class="home-body">'
     +'<div class="sec-label">Capacidades</div><div class="sec-h">Todo lo que necesitás para<br><strong>gestionar con criterio</strong></div><div class="sec-rule"></div>'
     +'<div class="ben-grid">'
