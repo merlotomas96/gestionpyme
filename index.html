@@ -391,9 +391,65 @@ textarea::placeholder{color:var(--t3);}
   .cases-grid{grid-template-columns:1fr;}
   .kbg{grid-template-columns:1fr;}
   .kpi-cards{grid-template-columns:1fr 1fr;}
+  /* Mobile bottom nav */
+  .mobile-nav{display:flex;}
+  /* Dashboard mobile */
+  .kpi-row{grid-template-columns:1fr 1fr;padding:12px 16px 0;}
+  .kpi-tile{padding:12px 14px;}
+  .kpi-val{font-size:18px;}
+  .dash-body{padding:12px 16px;}
+  .chart-grid{grid-template-columns:1fr;}
+  .chart-full{grid-column:1;}
+  .page-wrap{padding:16px;}
+  .dash-header{padding:10px 16px;flex-direction:column;align-items:flex-start;gap:10px;}
+  .demo-bar{padding:6px 16px;font-size:10px;}
+  /* Hide upload on mobile */
+  .mobile-hide{display:none;}
+  .home-hero{grid-template-columns:1fr;padding:32px 24px;}
+  .hero-right{display:none;}
+  .hero-h{font-size:26px;}
+  .hero-grid{grid-template-columns:1fr;}
+  .home-body,.howto-body{padding:28px 20px;}
+  .ben-grid,.flow-grid{grid-template-columns:1fr;}
+  .cases-grid{grid-template-columns:1fr;}
+  .closing{flex-direction:column;padding:24px;}
+}
+  /* MOBILE NAV BAR */
+.mobile-nav{display:none;position:fixed;bottom:0;left:0;right:0;height:56px;background:var(--surface);border-top:1px solid var(--border);z-index:200;align-items:stretch;}
+.mn-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;font-size:9px;color:var(--t3);transition:all .12s;border:none;background:transparent;font-family:var(--font);padding:4px 0;}
+.mn-item.active{color:var(--accent);}
+.mn-item svg{width:18px;height:18px;}
+/* Push content above mobile nav */
+@media(max-width:640px){
+  body{padding-bottom:56px;}
+  .topbar{height:48px;}
+  .sidebar{top:48px;height:calc(100vh - 48px);}
 }
 </style>
 </head>
+  <!-- MOBILE NAV -->
+<div class="mobile-nav" id="mobile-nav">
+  <button class="mn-item" onclick="nav('home')" id="mnav-home">
+    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 7L7 1L13 7"/><path d="M2 6v7h4v-4h2v4h4V6"/></svg>
+    Inicio
+  </button>
+  <button class="mn-item" onclick="nav('dashboard')" id="mnav-dashboard">
+    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><rect x="1" y="7" width="3" height="5"/><rect x="5.5" y="4" width="3" height="8"/><rect x="10" y="1" width="3" height="11"/></svg>
+    Dashboard
+  </button>
+  <button class="mn-item" onclick="nav('kpis')" id="mnav-kpis">
+    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="5"/><path d="M7 4v3l2 2"/></svg>
+    KPIs
+  </button>
+  <button class="mn-item" onclick="nav('chat')" id="mnav-chat">
+    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M1 2h12v8H8l-3 2v-2H1z"/></svg>
+    Chat IA
+  </button>
+  <button class="mn-item" onclick="nav('exportimport')" id="mnav-exportimport">
+    <svg viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 1v8M4 6l3 3 3-3M2 10v2h10v-2"/></svg>
+    Export
+  </button>
+</div>
 <body>
 
 <!-- TOPBAR -->
@@ -455,6 +511,10 @@ textarea::placeholder{color:var(--t3);}
     <div class="sb-divider"></div>
     <div class="sb-group">
       <div class="sb-label">App</div>
+      <div class="sb-item" onclick="nav('exportimport')" id="nav-exportimport">
+        <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><path d="M7 1v8M4 6l3 3 3-3M2 10v2h10v-2"/></svg></div>
+        Export / Import
+      </div>
       <div class="sb-item" onclick="nav('config')" id="nav-config">
         <div class="sb-icon"><svg width="14" height="14" viewBox="0 0 14 14" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"><circle cx="7" cy="7" r="2"/><path d="M7 1v2M7 11v2M1 7h2M11 7h2M3 3l1.4 1.4M9.6 9.6L11 11M3 11l1.4-1.4M9.6 4.4L11 3"/></svg></div>
         Configuración
@@ -471,6 +531,7 @@ textarea::placeholder{color:var(--t3);}
     <div class="page" id="page-dashboard"></div>
     <div class="page" id="page-kpis"></div>
     <div class="page" id="page-chat"></div>
+    <div class="page" id="page-exportimport"></div>
     <div class="page" id="page-config"></div>
   </div>
 </div>
@@ -700,6 +761,8 @@ function nav(page){
   document.querySelectorAll('.sb-item').forEach(function(i){i.classList.remove('active');});
   var pg=document.getElementById('page-'+page);if(pg)pg.classList.add('active');
   var nb=document.getElementById('nav-'+page);if(nb)nb.classList.add('active');
+  document.querySelectorAll('.mn-item').forEach(function(i){i.classList.remove('active');});
+  var mnb=document.getElementById('mnav-'+page);if(mnb)mnb.classList.add('active');
   updateBadges();renderPage(page);
 }
 function updateBadges(){
@@ -711,7 +774,7 @@ function renderPage(p){
   if(p==='home')renderHome();else if(p==='howto')renderHowto();
   else if(p==='archivos')renderArchivos();else if(p==='mapeo')renderMapeo();
   else if(p==='dashboard')renderDashboard();else if(p==='kpis')renderKPIs();
-  else if(p==='chat')renderChat();else if(p==='config')renderConfig();
+  else if(p==='chat')renderChat();else if(p==='exportimport')renderExportImport();else if(p==='config')renderConfig();
 }
 </script>
 <script>
@@ -1327,7 +1390,94 @@ function renderChat(){
 // ══════════════════════════════════════════════════════
 // PAGE: CONFIG
 // ══════════════════════════════════════════════════════
-function renderConfig(){
+function renderExportImport(){
+  var el=document.getElementById('page-exportimport');if(!el)return;
+  var fc=fileCount(),rows=Object.values(S.files).reduce(function(s,f){return s+(f.rows?f.rows.length:0);},0);
+  el.innerHTML='<div class="page-wrap"><div class="page-header"><div class="page-title">Export / Import</div><div class="page-sub">Guardá tu configuración completa en un archivo JSON. Restaurala en cualquier navegador o dispositivo.</div></div>'
+
+    // STATUS
+    +'<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);padding:16px 20px;margin-bottom:14px;display:flex;align-items:center;justify-content:space-between;box-shadow:var(--sh)">'
+    +'<div><div style="font-size:12px;font-weight:600;margin-bottom:3px">Estado actual</div>'
+    +'<div style="font-size:11px;color:var(--t2)">'+fc+' archivo(s) · '+rows+' filas · '+S.customKPIs.length+' KPIs personalizados · datos en localStorage</div></div>'
+    +'<div style="width:8px;height:8px;border-radius:50%;background:#4CAF50;flex-shrink:0"></div>'
+    +'</div>'
+
+    // EXPORT
+    +'<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:14px;box-shadow:var(--sh)">'
+    +'<div style="padding:14px 20px;border-bottom:1px solid var(--border)"><div style="font-size:12px;font-weight:600">Exportar</div><div style="font-size:11px;color:var(--t3);margin-top:2px">Descargá un backup completo: archivos, mapeos, KPIs y configuración</div></div>'
+    +'<div style="padding:14px 20px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">'
+    +'<div style="font-size:11px;color:var(--t2)">El archivo JSON incluye todo lo necesario para restaurar el estado exacto en otro navegador o dispositivo.</div>'
+    +'<button class="btn" onclick="exportState()" style="white-space:nowrap;flex-shrink:0">⬇ Descargar backup</button>'
+    +'</div></div>'
+
+    // IMPORT
+    +'<div style="background:var(--surface);border:1px solid var(--border);border-radius:var(--rl);overflow:hidden;margin-bottom:14px;box-shadow:var(--sh)">'
+    +'<div style="padding:14px 20px;border-bottom:1px solid var(--border)"><div style="font-size:12px;font-weight:600">Importar</div><div style="font-size:11px;color:var(--t3);margin-top:2px">Restaurá un backup previamente exportado</div></div>'
+    +'<div style="padding:14px 20px">'
+    +'<div style="background:var(--gl);border:1px solid #D4B030;border-radius:var(--rs);padding:8px 12px;font-size:11px;color:#6B5010;margin-bottom:12px">⚠ Importar reemplaza todos los datos actuales. Exportá primero si querés conservarlos.</div>'
+    +'<div style="position:relative;border:1.5px dashed var(--border2);border-radius:var(--r);padding:24px;text-align:center;cursor:pointer;transition:all .15s;" id="import-dz" onmouseover="this.style.borderColor=\'var(--accent)\'" onmouseout="this.style.borderColor=\'var(--border2)\'">'
+    +'<input type="file" accept=".json" onchange="importState(event)" style="position:absolute;inset:0;opacity:0;cursor:pointer;width:100%;height:100%">'
+    +'<div style="font-size:20px;margin-bottom:8px">📂</div>'
+    +'<div style="font-size:12px;font-weight:500;margin-bottom:4px">Arrastrá tu archivo .json o hacé click</div>'
+    +'<div style="font-size:10px;color:var(--t3)">Solo archivos exportados desde gestiónPyME</div>'
+    +'</div></div></div>'
+
+    // MOBILE NOTE
+    +'<div style="background:var(--al);border:1px solid var(--accent);border-radius:var(--rl);padding:16px 20px">'
+    +'<div style="font-size:12px;font-weight:600;color:var(--accent);margin-bottom:6px">📱 ¿Querés ver los datos en tu celular?</div>'
+    +'<div style="font-size:11px;color:var(--t2);line-height:1.7;margin-bottom:10px">Exportá el backup desde tu computadora, compartilo por WhatsApp o mail, y abrí gestiónPyME en el celular. Desde ahí importás el JSON y el dashboard queda disponible con todos tus datos.</div>'
+    +'<div style="font-size:10px;color:var(--t3)">La carga de archivos nuevos solo está habilitada desde desktop. En mobile el dashboard es de solo lectura.</div>'
+    +'</div>'
+    +'</div>';
+}
+
+function exportState(){
+  try{
+    var payload={
+      version:'2.4',
+      exportedAt:new Date().toISOString(),
+      files:S.files,
+      mappings:S.mappings,
+      customKPIs:S.customKPIs,
+      cb:S.cb,
+      dashView:S.dashView,
+      kpiView:S.kpiView,
+    };
+    var json=JSON.stringify(payload,null,2);
+    var blob=new Blob([json],{type:'application/json'});
+    var url=URL.createObjectURL(blob);
+    var a=document.createElement('a');
+    a.href=url;
+    var date=new Date().toISOString().split('T')[0];
+    a.download='gestionpyme_backup_'+date+'.json';
+    a.click();
+    URL.revokeObjectURL(url);
+  }catch(e){alert('Error al exportar: '+e.message);}
+}
+
+function importState(e){
+  var file=e.target.files[0];if(!file)return;
+  if(!confirm('¿Reemplazar todos los datos actuales con este backup?'))return;
+  var r=new FileReader();
+  r.onload=function(ev){
+    try{
+      var d=JSON.parse(ev.target.result);
+      if(!d.version||!d.files){alert('Archivo inválido. Asegurate de usar un backup de gestiónPyME.');return;}
+      S.files=d.files||{};
+      S.mappings=d.mappings||{};
+      S.customKPIs=d.customKPIs||[];
+      if(d.cb)S.cb=Object.assign(S.cb,d.cb);
+      if(d.dashView)S.dashView=d.dashView;
+      if(d.kpiView)S.kpiView=d.kpiView;
+      persist();
+      updateBadges();
+      alert('✓ Backup importado correctamente. '+Object.keys(S.files).length+' archivo(s) restaurado(s).');
+      nav('dashboard');
+    }catch(err){alert('Error al leer el archivo: '+err.message);}
+  };
+  r.readAsText(file);
+}  
+  function renderConfig(){
   var el=document.getElementById('page-config');if(!el)return;
   var fc=fileCount(),rows=Object.values(S.files).reduce(function(s,f){return s+(f.rows?f.rows.length:0);},0),dC=Object.keys(S.files).filter(function(k){return S.files[k].isDemo;}).length;
   el.innerHTML='<div class="page-wrap"><div class="page-header"><div class="page-title">Configuración</div></div>'
